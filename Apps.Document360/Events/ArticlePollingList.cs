@@ -1,4 +1,4 @@
-﻿using Apps.Document360.Api;
+using Apps.Document360.Api;
 using Apps.Document360.Models.Dtos;
 using Apps.Document360.Models.Polling;
 using Apps.Document360.Models.Responses;
@@ -21,13 +21,13 @@ public class ArticlePollingList(InvocationContext invocationContext) : Invocable
         PollingEventRequest<PollingMemory> request,
         [PollingEventParameter] ArticlesCreatedFilter filter)
     {
-        Validate.Workspace(filter);
-
+        // The articles of a workspace can only be listed per workspace, so this event cannot poll without one.
+        var workspaceId = Validate.Workspace(filter);
 
         if (request.Memory?.LastPollingTime is null)
-            return Respond(new PollingMemory { LastPollingTime = DateTime.UtcNow }, null, filter.WorkspaceId);
+            return Respond(new PollingMemory { LastPollingTime = DateTime.UtcNow }, null, workspaceId);
 
-        var articles = await GetArticlesAsync(filter.WorkspaceId, filter.Locale, filter.Visibility);
+        var articles = await GetArticlesAsync(workspaceId, filter.Locale, filter.Visibility);
 
 
         var memory = new PollingMemory { LastPollingTime = DateTime.UtcNow };
@@ -36,7 +36,7 @@ public class ArticlePollingList(InvocationContext invocationContext) : Invocable
         created = ArticleFilters.ByPublicationStatus(created, filter.PublicationStatus);
         created = await KeepTaggedAsync(created, filter.Locale, filter.Tags);
 
-        return Respond(memory, created, filter.WorkspaceId);
+        return Respond(memory, created, workspaceId);
     }
 
     [BlueprintEventDefinition(BlueprintEvent.ContentCreatedOrUpdatedMultiple)]
@@ -48,9 +48,10 @@ public class ArticlePollingList(InvocationContext invocationContext) : Invocable
         PollingEventRequest<PublishedVersionsMemory> request,
         [PollingEventParameter] ArticlesPublishedFilter filter)
     {
-        Validate.Workspace(filter);
+        // The articles of a workspace can only be listed per workspace, so this event cannot poll without one.
+        var workspaceId = Validate.Workspace(filter);
 
-        var articles = await GetArticlesAsync(filter.WorkspaceId, filter.Locale, filter.Visibility);
+        var articles = await GetArticlesAsync(workspaceId, filter.Locale, filter.Visibility);
 
         var memory = new PublishedVersionsMemory
         {
@@ -59,12 +60,12 @@ public class ArticlePollingList(InvocationContext invocationContext) : Invocable
         };
 
 
-        if (request.Memory?.PublishedVersions is null) return Respond(memory, null, filter.WorkspaceId);
+        if (request.Memory?.PublishedVersions is null) return Respond(memory, null, workspaceId);
 
         var published = KeepNewlyLive(articles, request.Memory.PublishedVersions);
         published = await KeepTaggedAsync(published, filter.Locale, filter.Tags);
 
-        return Respond(memory, published, filter.WorkspaceId);
+        return Respond(memory, published, workspaceId);
     }
 
     private Task<List<ArticleListItemDto>> GetArticlesAsync(string workspaceId, string? locale, string? visibility) =>

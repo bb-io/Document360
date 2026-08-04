@@ -1,4 +1,4 @@
-﻿using System.Net.Mime;
+using System.Net.Mime;
 using System.Text;
 using Apps.Document360.Constants;
 using Apps.Document360.Extensions;
@@ -36,7 +36,8 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
     [Action("Search articles", Description = "Find the articles of a workspace that match your filters.")]
     public async Task<SearchArticlesResponse> SearchArticles([ActionParameter] SearchArticlesRequest request)
     {
-        Validate.Workspace(request);
+        // The articles of a workspace can only be listed per workspace, so this action cannot run without one.
+        var workspaceId = Validate.Workspace(request);
 
         if (!string.IsNullOrWhiteSpace(request.TranslationStatus) && string.IsNullOrWhiteSpace(request.Locale))
             throw new PluginMisconfigurationException(
@@ -46,13 +47,13 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
             throw new PluginMisconfigurationException(
                 "'Max results' has to be 1 or higher. Leave it empty to return every match.");
 
-        var articles = await ArticleProvider.GetArticlesAsync(Client, request.WorkspaceId, request.Locale,
+        var articles = await ArticleProvider.GetArticlesAsync(Client, workspaceId, request.Locale,
             Validate.Option(request.Visibility, "Visibility"));
 
         if (!string.IsNullOrWhiteSpace(request.TranslationStatus))
         {
             var translationStatus = Validate.Option(request.TranslationStatus, "Translation status")!.Value;
-            var matching = await GetTranslationArticleIdsAsync(request.WorkspaceId, request.Locale!,
+            var matching = await GetTranslationArticleIdsAsync(workspaceId, request.Locale!,
                 translationStatus);
             articles = articles.Where(article => matching.Contains(article.Id)).ToList();
         }
@@ -68,7 +69,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         if (request.MaxResults.HasValue) articles = articles.Take(request.MaxResults.Value).ToList();
 
         var results = articles
-            .Select(article => new ArticleListItemResponse(article, request.WorkspaceId))
+            .Select(article => new ArticleListItemResponse(article, workspaceId))
             .ToList();
 
         return new SearchArticlesResponse { Articles = results, TotalCount = results.Count };
@@ -96,7 +97,6 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         [ActionParameter] DownloadArticleRequest request,
         [ActionParameter] DownloadArticleOptions options)
     {
-        Validate.Workspace(request);
         Validate.Required(request.ContentId, "Article ID");
         Validate.Required(request.Locale, "Locale");
 
@@ -131,14 +131,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         {
             Content = await fileManagementClient.UploadAsync(stream, MediaTypeNames.Text.Html, fileName),
             ArticleId = article.Id,
-            Locale = request.Locale,
-            Title = article.Title ?? string.Empty,
-            ArticleUrl = article.Url ?? string.Empty,
-            EditorFormat = Document360Enums.EditorFormat(article.ContentType),
-            VersionNumber = article.VersionNumber ?? 0,
-            Status = Document360Enums.ArticleStatus(article.Status),
-            TranslationStatus = Document360Enums.TranslationStatus(article.TranslationOption),
-            IsFallbackContent = article.IsFallBackContent ?? false
+            Locale = request.Locale
         };
     }
 
@@ -149,7 +142,6 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
             "fields that actually changed are written.")]
     public async Task<ArticleContentResponse> UploadArticle([ActionParameter] UploadArticleRequest request)
     {
-        Validate.Workspace(request);
         Validate.Required(request.Locale, "Locale");
 
         if (request.Content is null)
@@ -230,15 +222,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         {
             Content = await BuildUploadedFileAsync(request, loadResult, article),
             ArticleId = article.Id,
-            Locale = request.Locale,
-            Title = article.Title ?? string.Empty,
-            ArticleUrl = article.Url ?? string.Empty,
-            EditorFormat = Document360Enums.EditorFormat(article.ContentType),
-            VersionNumber = article.VersionNumber ?? 0,
-            Status = Document360Enums.ArticleStatus(article.Status),
-            TranslationStatus = Document360Enums.TranslationStatus(article.TranslationOption),
-            WasCopiedToNewDraft = wasCopiedToNewDraft,
-            UpdatedFields = updatedFields
+            Locale = request.Locale
         };
     }
     
@@ -248,7 +232,8 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
             "draft, and can be put live on the knowledge base site right away.")]
     public async Task<CreateArticleResponse> CreateArticle([ActionParameter] CreateArticleRequest request)
     {
-        Validate.Workspace(request);
+        // The new article is filed into a workspace, so this action cannot run without one.
+        var workspaceId = Validate.Workspace(request);
         Validate.Required(request.Title, "Title");
         Validate.Required(request.CategoryId, "Category ID");
         Validate.Required(request.UserId, "User ID");
@@ -262,7 +247,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
             ["title"] = request.Title,
             ["content"] = await ReadFileAsTextAsync(request.File),
             ["category_id"] = request.CategoryId,
-            ["project_version_id"] = request.WorkspaceId,
+            ["project_version_id"] = workspaceId,
             ["user_id"] = request.UserId
         };
 
@@ -273,7 +258,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         var created = await CreateArticleAsync(body);
 
         var locale = string.IsNullOrWhiteSpace(created.LanguageCode)
-            ? await ResolveDefaultLocaleAsync(request.WorkspaceId)
+            ? await ResolveDefaultLocaleAsync(workspaceId)
             : created.LanguageCode;
 
         var article = await GetArticleAsync(created.Id, locale);
@@ -602,8 +587,18 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
                    "not be read back. Use 'Get article info' to fetch its details.");
     }
 
-    private async Task RequireLocaleExistsAsync(string workspaceId, string locale)
+    /// <summary>
+    /// Fails before anything is read or written when the locale is not enabled on the workspace, because
+    /// Document360 answers an unknown locale with fallback content in another language rather than an error.
+    /// </summary>
+    /// <remarks>
+    /// Skipped when no workspace was given: the enabled locales can only be listed per workspace, and the
+    /// workspace is optional here because the article ID alone addresses the article.
+    /// </remarks>
+    private async Task RequireLocaleExistsAsync(string? workspaceId, string locale)
     {
+        if (string.IsNullOrWhiteSpace(workspaceId)) return;
+
         var locales = await ProjectProvider.GetWorkspaceLocalesAsync(Client, workspaceId);
         if (locales.Any(x => string.Equals(x.LanguageCode, locale, StringComparison.OrdinalIgnoreCase))) return;
 

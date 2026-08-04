@@ -1,28 +1,37 @@
-﻿using Apps.Document360.Models.Identifiers;
+using Apps.Document360.Models.Identifiers;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.Document360.Utils;
 
-
 public static class Validate
 {
-    public static void Required(string? value, string fieldName)
+    /// <returns>The value, so a caller can use it without a null check of its own.</returns>
+    public static string Required(string? value, string fieldName)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new PluginMisconfigurationException($"'{fieldName}' cannot be empty. Please fill it in.");
+
+        return value;
     }
 
-    public static void Workspace(WorkspaceIdentifier identifier) =>
+    /// <summary>Reads the workspace of an action that addresses a whole workspace and cannot run without one.</summary>
+    public static string Workspace(WorkspaceIdentifier identifier) =>
         Required(identifier.WorkspaceId, "Workspace ID");
 
+    /// <summary>
+    /// The inputs needed to address one article translation. The workspace is deliberately not among them: these
+    /// endpoints are addressed by article ID alone, and Document360 reports the workspace back on the article.
+    /// </summary>
     public static void Article(ArticleIdentifier identifier)
     {
-        Workspace(identifier);
         Required(identifier.ArticleId, "Article ID");
         Required(identifier.Locale, "Locale");
     }
 
-
+    /// <summary>
+    /// Reads back one of the numeric options a dropdown offers. A value that is not a number can only come from a
+    /// hand-typed or mapped input, which is worth naming rather than silently ignoring.
+    /// </summary>
     public static int? Option(string? value, string fieldName)
     {
         if (string.IsNullOrWhiteSpace(value)) return null;

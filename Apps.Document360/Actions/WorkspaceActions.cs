@@ -26,9 +26,9 @@ public class WorkspaceActions(InvocationContext invocationContext) : Invocable(i
     public async Task<SearchWorkspaceLocalesResponse> SearchWorkspaceLocales(
         [ActionParameter] WorkspaceIdentifier identifier)
     {
-        Validate.Workspace(identifier);
+        var workspaceId = Validate.Workspace(identifier);
 
-        var locales = await ProjectProvider.GetWorkspaceLocalesAsync(Client, identifier.WorkspaceId);
+        var locales = await ProjectProvider.GetWorkspaceLocalesAsync(Client, workspaceId);
         var results = locales.Select(locale => new LocaleResponse(locale)).ToList();
 
         return new SearchWorkspaceLocalesResponse { Locales = results, TotalCount = results.Count };

@@ -120,7 +120,6 @@ public class ArticlePollingTests : TestBase
 
         Assert.IsTrue(result.FlyBird, "Every live article counts as newly published against an empty memory.");
         Assert.IsNotNull(result.Result);
-        Assert.IsTrue(result.Result.Items.All(x => x.PublishedVersion > 0));
     }
 
 

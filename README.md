@@ -29,7 +29,7 @@ The team account you pick as an author has to have signed in to Document360 at l
 
 ## Actions
 
-Every action that works with a single article asks for a **Workspace ID** as well as an **Article ID**. Document360 calls a workspace a project version; it scopes the article, category and locale lists so you can pick values instead of typing identifiers.
+Every action that works with a single article asks for an **Article ID**, and offers a **Workspace ID** alongside it. Document360 calls a workspace a project version; it scopes the article, category and locale lists so you can pick values instead of typing identifiers. On those actions the workspace is optional, because an article ID identifies an article on its own — see **Advanced settings** below.
 
 ### Articles
 
@@ -54,14 +54,16 @@ Every action that works with a single article asks for a **Workspace ID** as wel
 
 These inputs are optional and can be left empty:
 
+**Workspace ID** is required only by **Search articles**, **Create article**, **Search workspace locales** and the two events, which address a whole workspace. Everywhere else an article is addressed by its ID alone, so the workspace only narrows the Article ID and Locale dropdowns and can be left empty — handy when the Article ID comes from an earlier workflow step. Leaving it empty on **Download article** and **Upload article** skips one safeguard: the check that the locale is actually enabled on the workspace, which otherwise catches a wrong locale before Document360 silently serves fallback content in another language.
+
 | Action | Optional inputs |
 | --- | --- |
 | Create article | Editor format, Slug, Order, Publish, Publish message |
-| Update article | Title, File, Content, Translation status, Hidden, Category ID, Order, Description, Tags, Custom field IDs, Custom field values, SEO title, Meta description, User ID |
-| Publish article | Version number, Publish message |
-| Download article | Use published version, Version number, Resolve merge codes, File name |
-| Upload article | Article ID, User ID |
-| Get article info | Use published version |
+| Update article | Workspace ID, Title, File, Content, Translation status, Hidden, Category ID, Order, Description, Tags, Custom field IDs, Custom field values, SEO title, Meta description, User ID |
+| Publish article | Workspace ID, Version number, Publish message |
+| Download article | Workspace ID, Use published version, Version number, Resolve merge codes, File name |
+| Upload article | Workspace ID, Article ID, User ID |
+| Get article info | Workspace ID, Use published version |
 | Search articles | Locale, Publication status, Visibility, Translation status, Hidden, Modified after, Max results |
 
 To write custom fields with **Update article**, list the fields under **Custom field IDs** and their values under **Custom field values** in the same order. For a dropdown field the value is the option ID, which **Search custom fields** and **Get article info** both return.
