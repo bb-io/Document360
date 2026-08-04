@@ -8,7 +8,6 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Document360.Handlers;
 
-
 public abstract class ArticleVersionDataHandlerBase(InvocationContext invocationContext)
     : Invocable(invocationContext), IAsyncDataSourceItemHandler
 {

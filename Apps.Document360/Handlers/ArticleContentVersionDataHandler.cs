@@ -4,7 +4,6 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Document360.Handlers;
 
-
 public class ArticleContentVersionDataHandler(
     InvocationContext invocationContext,
     [ActionParameter] DownloadArticleRequest request)

@@ -4,7 +4,6 @@ using RestSharp;
 
 namespace Apps.Document360.Providers;
 
-
 public static class ArticleProvider
 {
     private const int MaxPages = 50;

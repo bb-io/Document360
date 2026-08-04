@@ -3,7 +3,6 @@ using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Document360.Handlers.Static;
 
-
 public class PublicationStatusDataHandler : IStaticDataSourceItemHandler
 {
     public const string Draft = "draft";

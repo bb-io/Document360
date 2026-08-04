@@ -6,7 +6,6 @@ using HtmlAgilityPack;
 
 namespace Apps.Document360.Utils;
 
-
 public static partial class ArticleHtmlReader
 {
     public static ArticleTranslatableFields Read(string html)

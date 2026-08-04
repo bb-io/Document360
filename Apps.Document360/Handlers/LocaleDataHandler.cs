@@ -7,7 +7,6 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Document360.Handlers;
 
-
 public class LocaleDataHandler(InvocationContext invocationContext, [ActionParameter] WorkspaceOptionalIdentifier workspaceOptional)
     : Invocable(invocationContext), IAsyncDataSourceItemHandler
 {

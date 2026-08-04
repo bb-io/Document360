@@ -4,7 +4,6 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Document360.Handlers;
 
-
 public class ArticleVersionDataHandler(
     InvocationContext invocationContext,
     [ActionParameter] ArticleOptionalIdentifier articleOptional)

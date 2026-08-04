@@ -3,14 +3,12 @@ using Apps.Document360.Models.Dtos;
 
 namespace Apps.Document360.Utils;
 
-
 public static class ArticleContent
 {
     public static string Select(ArticleDto article) =>
         article.ContentType == Document360Enums.EditorFormatMarkdown
             ? FirstNonEmpty(article.Content, article.HtmlContent)
             : FirstNonEmpty(article.HtmlContent, article.Content);
-
 
     public static string DecodeUtf8(byte[] bytes)
     {

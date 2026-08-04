@@ -5,7 +5,6 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Document360.Handlers;
 
-
 public class CustomFieldDataHandler(InvocationContext invocationContext)
     : Invocable(invocationContext), IAsyncDataSourceItemHandler
 {

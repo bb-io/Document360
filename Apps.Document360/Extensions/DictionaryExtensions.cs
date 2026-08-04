@@ -1,17 +1,14 @@
 ﻿namespace Apps.Document360.Extensions;
 
-
 public static class DictionaryExtensions
 {
-
     public static Dictionary<string, object> AddIfNotNull(this Dictionary<string, object> body, string key,
         string? value)
     {
         if (value is not null) body[key] = value;
         return body;
     }
-
-
+    
     public static Dictionary<string, object> AddIfNotEmpty(this Dictionary<string, object> body, string key,
         string? value)
     {

@@ -2,7 +2,6 @@
 
 namespace Apps.Document360.Extensions;
 
-
 public static class DataSourceExtensions
 {
     private const int MaxItems = 50;

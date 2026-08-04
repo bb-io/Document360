@@ -14,9 +14,7 @@ namespace Apps.Document360.Api;
 
 public class Document360Client : BlackBirdRestClient
 {
-
     public const int MaxPageSize = 100;
-
     private const int RetryCount = 8;
     private const int BaseBackoffSeconds = 1;
     private const int MaxBackoffSeconds = 16;

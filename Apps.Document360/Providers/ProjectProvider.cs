@@ -4,11 +4,8 @@ using RestSharp;
 
 namespace Apps.Document360.Providers;
 
-
 public static class ProjectProvider
 {
-
-
     public static Task<List<ProjectVersionDto>> GetWorkspacesAsync(Document360Client client,
         CancellationToken cancellationToken = default) =>
         client.GetListAsync<ProjectVersionDto>(new RestRequest("/v2/ProjectVersions", Method.Get), cancellationToken);

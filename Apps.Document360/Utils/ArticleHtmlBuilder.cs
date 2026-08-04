@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 
 namespace Apps.Document360.Utils;
 
-
 public static class ArticleHtmlBuilder
 {
     private const int DescriptionMaxLength = 250;
@@ -60,7 +59,6 @@ public static class ArticleHtmlBuilder
 
         return coder.Serialize(content, MetadataHandling.Include);
     }
-
 
     public static string BuildFileName(string? title, string articleId, string locale)
     {

@@ -7,7 +7,6 @@ using RestSharp;
 
 namespace Apps.Document360.Handlers;
 
-
 public class TeamAccountDataHandler(InvocationContext invocationContext)
     : Invocable(invocationContext), IAsyncDataSourceItemHandler
 {
