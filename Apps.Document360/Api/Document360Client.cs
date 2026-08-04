@@ -21,7 +21,6 @@ public class Document360Client : BlackBirdRestClient
     private const int BaseBackoffSeconds = 1;
     private const int MaxBackoffSeconds = 16;
 
-
     private readonly AsyncRetryPolicy<RestResponse> retryPolicy = Policy
         .HandleResult<RestResponse>(response => response.StatusCode == HttpStatusCode.TooManyRequests)
         .WaitAndRetryAsync(RetryCount, (retryAttempt, result, _) => GetRetryDelay(retryAttempt, result.Result),
@@ -40,10 +39,8 @@ public class Document360Client : BlackBirdRestClient
         this.AddDefaultHeader("Accept", "application/json");
     }
 
-
     public Uri ApiHubUrl { get; }
-
-
+    
     public async Task<T> GetDataAsync<T>(RestRequest request, CancellationToken cancellationToken = default)
         where T : class
     {
@@ -146,7 +143,6 @@ public class Document360Client : BlackBirdRestClient
 
     protected override Exception ConfigureErrorException(RestResponse response)
     {
-
         if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
             return new PluginMisconfigurationException(
                 "Document360 rejected the API token. Check the token in your connection and make sure the API hub " +

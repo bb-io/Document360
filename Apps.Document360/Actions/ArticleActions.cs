@@ -30,15 +30,10 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
     : Invocable(invocationContext)
 {
     private const int DescriptionMaxLength = 250;
-
-    private static readonly string[] SupportedUploadExtensions = [".html", ".xliff", ".xlf"];
-
+    
     [Action("Search articles", Description = "Find the articles of a workspace that match your filters.")]
     public async Task<SearchArticlesResponse> SearchArticles([ActionParameter] SearchArticlesRequest request)
     {
-        // The articles of a workspace can only be listed per workspace, so this action cannot run without one.
-        var workspaceId = Validate.Workspace(request);
-
         if (!string.IsNullOrWhiteSpace(request.TranslationStatus) && string.IsNullOrWhiteSpace(request.Locale))
             throw new PluginMisconfigurationException(
                 "Filtering by translation status needs to know which language to look at. Please fill in 'Locale'.");
@@ -47,13 +42,13 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
             throw new PluginMisconfigurationException(
                 "'Max results' has to be 1 or higher. Leave it empty to return every match.");
 
-        var articles = await ArticleProvider.GetArticlesAsync(Client, workspaceId, request.Locale,
+        var articles = await ArticleProvider.GetArticlesAsync(Client, request.WorkspaceId, request.Locale,
             Validate.Option(request.Visibility, "Visibility"));
 
         if (!string.IsNullOrWhiteSpace(request.TranslationStatus))
         {
             var translationStatus = Validate.Option(request.TranslationStatus, "Translation status")!.Value;
-            var matching = await GetTranslationArticleIdsAsync(workspaceId, request.Locale!,
+            var matching = await GetTranslationArticleIdsAsync(request.WorkspaceId, request.Locale!,
                 translationStatus);
             articles = articles.Where(article => matching.Contains(article.Id)).ToList();
         }
@@ -69,7 +64,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         if (request.MaxResults.HasValue) articles = articles.Take(request.MaxResults.Value).ToList();
 
         var results = articles
-            .Select(article => new ArticleListItemResponse(article, workspaceId))
+            .Select(article => new ArticleListItemResponse(article, request.WorkspaceId))
             .ToList();
 
         return new SearchArticlesResponse { Articles = results, TotalCount = results.Count };
@@ -77,7 +72,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
     
     [Action("Get article info",
         Description = "Get all details of an article translation, including its tags, custom fields and languages.")]
-    public async Task<ArticleInfoResponse> GetArticleInfo([ActionParameter] GetArticleInfoRequest request)
+    public async Task<ArticleInfoResponse> GetArticleInfo([ActionParameter] GetArticleOptionalInfoRequest request)
     {
         Validate.Article(request);
 
@@ -147,12 +142,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         if (request.Content is null)
             throw new PluginMisconfigurationException(
                 "The translated file is missing. Please fill in 'File' with the file to write back.");
-
-        if (!SupportedUploadExtensions.Any(extension =>
-                (request.Content.Name ?? string.Empty).EndsWith(extension, StringComparison.OrdinalIgnoreCase)))
-            throw new PluginMisconfigurationException(
-                $"'{request.Content.Name}' cannot be read. Please supply an .html, .xliff or .xlf file.");
-
+        
         await RequireLocaleExistsAsync(request.WorkspaceId, request.Locale);
 
         var stream = await fileManagementClient.DownloadAsync(request.Content);
@@ -232,8 +222,6 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
             "draft, and can be put live on the knowledge base site right away.")]
     public async Task<CreateArticleResponse> CreateArticle([ActionParameter] CreateArticleRequest request)
     {
-        // The new article is filed into a workspace, so this action cannot run without one.
-        var workspaceId = Validate.Workspace(request);
         Validate.Required(request.Title, "Title");
         Validate.Required(request.CategoryId, "Category ID");
         Validate.Required(request.UserId, "User ID");
@@ -247,7 +235,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
             ["title"] = request.Title,
             ["content"] = await ReadFileAsTextAsync(request.File),
             ["category_id"] = request.CategoryId,
-            ["project_version_id"] = workspaceId,
+            ["project_version_id"] = request.WorkspaceId,
             ["user_id"] = request.UserId
         };
 
@@ -258,15 +246,13 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         var created = await CreateArticleAsync(body);
 
         var locale = string.IsNullOrWhiteSpace(created.LanguageCode)
-            ? await ResolveDefaultLocaleAsync(workspaceId)
+            ? await ResolveDefaultLocaleAsync(request.WorkspaceId)
             : created.LanguageCode;
 
         var article = await GetArticleAsync(created.Id, locale);
 
         if (request.Publish != true) return new CreateArticleResponse(article, locale);
 
-        // A brand-new article has exactly one version, but it is read from the article rather than assumed, so the
-        // right one is published even if Document360 ever starts creating more than one.
         var published = await PublishVersionAsync(created.Id, locale, request.UserId,
             article.LatestVersion ?? article.VersionNumber ?? 1, request.PublishMessage);
 
@@ -277,64 +263,64 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         Description =
             "Update the content and metadata of an article translation, leaving it as an editable draft. " +
             "A locale that has never been translated is created on first use.")]
-    public async Task<UpdateArticleResponse> UpdateArticle([ActionParameter] UpdateArticleRequest request)
+    public async Task<UpdateArticleResponse> UpdateArticle([ActionParameter] UpdateArticleOptionalRequest optionalRequest)
     {
-        Validate.Article(request);
+        Validate.Article(optionalRequest);
 
-        if (request.File is not null && !string.IsNullOrEmpty(request.Content))
+        if (optionalRequest.File is not null && !string.IsNullOrEmpty(optionalRequest.Content))
             throw new PluginMisconfigurationException(
                 "The article body was supplied twice. Please fill in either 'File' or 'Content', not both.");
 
-        RequireDescriptionFits(request.Description);
+        RequireDescriptionFits(optionalRequest.Description);
 
-        var customFields = BuildCustomFields(request.CustomFieldIds, request.CustomFieldValues);
-        var current = await GetArticleAsync(request.ArticleId, request.Locale);
+        var customFields = BuildCustomFields(optionalRequest.CustomFieldIds, optionalRequest.CustomFieldValues);
+        var current = await GetArticleAsync(optionalRequest.ArticleId, optionalRequest.Locale);
 
         var contentBody = new Dictionary<string, object>()
-            .AddIfNotEmpty("title", request.Title)
+            .AddIfNotEmpty("title", optionalRequest.Title)
             .AddIfNotNull("content",
-                request.File is not null ? await ReadFileAsTextAsync(request.File) : request.Content)
-            .AddIfNotEmpty("translation_option", request.TranslationStatus)
-            .AddIfNotNull("hidden", request.Hidden)
-            .AddIfNotEmpty("category_id", request.CategoryId)
-            .AddIfNotNull("order", request.Order);
+                optionalRequest.File is not null ? await ReadFileAsTextAsync(optionalRequest.File) : optionalRequest.Content)
+            .AddIfNotEmpty("translation_option", optionalRequest.TranslationStatus)
+            .AddIfNotNull("hidden", optionalRequest.Hidden)
+            .AddIfNotEmpty("category_id", optionalRequest.CategoryId)
+            .AddIfNotNull("order", optionalRequest.Order);
 
         var wasCopiedToNewDraft =
-            await WriteArticleContentAsync(request.ArticleId, request.Locale, contentBody, current, request.UserId);
+            await WriteArticleContentAsync(optionalRequest.ArticleId, optionalRequest.Locale, contentBody, current, optionalRequest.UserId);
 
-        if (request.Description is not null)
-            await UpdateArticleDescriptionAsync(request.ArticleId, request.Locale, request.Description);
+        if (optionalRequest.Description is not null)
+            await UpdateArticleDescriptionAsync(optionalRequest.ArticleId, optionalRequest.Locale, optionalRequest.Description);
 
         var settingsBody = new Dictionary<string, object>()
-            .AddIfNotEmpty("seo_title", request.SeoTitle)
-            .AddIfNotEmpty("description", request.MetaDescription);
+            .AddIfNotEmpty("seo_title", optionalRequest.SeoTitle)
+            .AddIfNotEmpty("description", optionalRequest.MetaDescription);
 
-        if (request.Tags is not null) settingsBody["tags"] = request.Tags.ToList();
+        if (optionalRequest.Tags is not null) settingsBody["tags"] = optionalRequest.Tags.ToList();
         if (customFields.Count > 0) settingsBody["custom_fields"] = customFields;
 
         if (settingsBody.Count > 0)
-            await UpdateArticleSettingsAsync(request.ArticleId, request.Locale, settingsBody);
+            await UpdateArticleSettingsAsync(optionalRequest.ArticleId, optionalRequest.Locale, settingsBody);
 
-        var article = await GetArticleAsync(request.ArticleId, request.Locale);
-        var settings = await TryGetSettingsAsync(request.ArticleId, request.Locale);
+        var article = await GetArticleAsync(optionalRequest.ArticleId, optionalRequest.Locale);
+        var settings = await TryGetSettingsAsync(optionalRequest.ArticleId, optionalRequest.Locale);
 
-        return new UpdateArticleResponse(article, settings, request.Locale, wasCopiedToNewDraft);
+        return new UpdateArticleResponse(article, settings, optionalRequest.Locale, wasCopiedToNewDraft);
     }
 
     [Action("Publish article", Description = "Put an article translation live on the knowledge base site.")]
-    public async Task<PublishArticleResponse> PublishArticle([ActionParameter] PublishArticleRequest request)
+    public async Task<PublishArticleResponse> PublishArticle([ActionParameter] PublishArticleOptionalRequest optionalRequest)
     {
-        Validate.Article(request);
-        Validate.Required(request.UserId, "User ID");
+        Validate.Article(optionalRequest);
+        Validate.Required(optionalRequest.UserId, "User ID");
 
-        if (request.VersionNumber is <= 0)
+        if (optionalRequest.VersionNumber is <= 0)
             throw new PluginMisconfigurationException(
                 "'Version number' has to be 1 or higher. Leave it empty to publish the newest version.");
 
-        var version = request.VersionNumber ?? await ResolveLatestVersionAsync(request.ArticleId, request.Locale);
+        var version = optionalRequest.VersionNumber ?? await ResolveLatestVersionAsync(optionalRequest.ArticleId, optionalRequest.Locale);
 
-        return await PublishVersionAsync(request.ArticleId, request.Locale, request.UserId, version,
-            request.PublishMessage);
+        return await PublishVersionAsync(optionalRequest.ArticleId, optionalRequest.Locale, optionalRequest.UserId, version,
+            optionalRequest.PublishMessage);
     }
 
     /// <summary>

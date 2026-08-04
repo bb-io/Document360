@@ -15,17 +15,17 @@ public static class Validate
     }
 
     /// <summary>Reads the workspace of an action that addresses a whole workspace and cannot run without one.</summary>
-    public static string Workspace(WorkspaceIdentifier identifier) =>
-        Required(identifier.WorkspaceId, "Workspace ID");
+    public static string Workspace(WorkspaceOptionalIdentifier optionalIdentifier) =>
+        Required(optionalIdentifier.WorkspaceId, "Workspace ID");
 
     /// <summary>
     /// The inputs needed to address one article translation. The workspace is deliberately not among them: these
     /// endpoints are addressed by article ID alone, and Document360 reports the workspace back on the article.
     /// </summary>
-    public static void Article(ArticleIdentifier identifier)
+    public static void Article(ArticleOptionalIdentifier optionalIdentifier)
     {
-        Required(identifier.ArticleId, "Article ID");
-        Required(identifier.Locale, "Locale");
+        Required(optionalIdentifier.ArticleId, "Article ID");
+        Required(optionalIdentifier.Locale, "Locale");
     }
 
     /// <summary>

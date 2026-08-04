@@ -11,7 +11,7 @@ public class DataSourceHandlerTests : TestBase
 {
     private static DataSourceContext EmptyContext => new() { SearchString = null };
 
-    private static WorkspaceIdentifier Workspace => new() { WorkspaceId = TestData.WorkspaceId };
+    private static WorkspaceOptionalIdentifier WorkspaceOptional => new() { WorkspaceId = TestData.WorkspaceId };
 
     [TestMethod]
     public async Task WorkspaceHandler_ReturnsWorkspaces()
@@ -27,7 +27,7 @@ public class DataSourceHandlerTests : TestBase
     [TestMethod]
     public async Task LocaleHandler_WithWorkspace_ReturnsLocales()
     {
-        var items = (await new LocaleDataHandler(InvocationContext, Workspace)
+        var items = (await new LocaleDataHandler(InvocationContext, WorkspaceOptional)
             .GetDataAsync(EmptyContext, CancellationToken.None)).ToList();
 
         foreach (var item in items) Console.WriteLine($"{item.Value} - {item.DisplayName}");
@@ -39,7 +39,7 @@ public class DataSourceHandlerTests : TestBase
     [TestMethod]
     public async Task LocaleHandler_WithoutWorkspace_StillReturnsLocales()
     {
-        var items = (await new LocaleDataHandler(InvocationContext, new WorkspaceIdentifier())
+        var items = (await new LocaleDataHandler(InvocationContext, new WorkspaceOptionalIdentifier())
             .GetDataAsync(EmptyContext, CancellationToken.None)).ToList();
 
         Console.WriteLine($"Locales across the project: {items.Count}");
@@ -50,7 +50,7 @@ public class DataSourceHandlerTests : TestBase
     [TestMethod]
     public async Task CategoryHandler_ReturnsFlattenedPaths()
     {
-        var items = (await new CategoryDataHandler(InvocationContext, Workspace)
+        var items = (await new CategoryDataHandler(InvocationContext, WorkspaceOptional)
             .GetDataAsync(EmptyContext, CancellationToken.None)).ToList();
 
         foreach (var item in items.Take(10)) Console.WriteLine(item.DisplayName);
@@ -62,7 +62,7 @@ public class DataSourceHandlerTests : TestBase
     [TestMethod]
     public async Task ArticleHandler_ReturnsArticles()
     {
-        var items = (await new ArticleDataHandler(InvocationContext, Workspace)
+        var items = (await new ArticleDataHandler(InvocationContext, WorkspaceOptional)
             .GetDataAsync(EmptyContext, CancellationToken.None)).ToList();
 
         Console.WriteLine($"Articles offered: {items.Count}");
@@ -73,7 +73,7 @@ public class DataSourceHandlerTests : TestBase
     [TestMethod]
     public async Task ArticleHandler_WithoutWorkspace_ReturnsEmpty()
     {
-        var items = (await new ArticleDataHandler(InvocationContext, new WorkspaceIdentifier())
+        var items = (await new ArticleDataHandler(InvocationContext, new WorkspaceOptionalIdentifier())
             .GetDataAsync(EmptyContext, CancellationToken.None)).ToList();
 
         Assert.AreEqual(0, items.Count);
@@ -93,7 +93,7 @@ public class DataSourceHandlerTests : TestBase
     [TestMethod]
     public async Task ArticleVersionHandler_ReturnsVersions()
     {
-        var article = new ArticleIdentifier
+        var article = new ArticleOptionalIdentifier
         {
             WorkspaceId = TestData.WorkspaceId,
             ArticleId = TestData.MarkdownArticleId,

@@ -5,7 +5,7 @@ using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Document360.Models.Requests;
 
-public class PublishArticleRequest : ArticleIdentifier
+public class PublishArticleOptionalRequest : ArticleOptionalIdentifier
 {
     [Display("User ID", Description = "The team account credited with publishing the article.")]
     [DataSource(typeof(TeamAccountDataHandler))]

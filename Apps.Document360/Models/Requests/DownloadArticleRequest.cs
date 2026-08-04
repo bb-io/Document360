@@ -6,7 +6,7 @@ using Blackbird.Applications.SDK.Blueprints.Interfaces.CMS;
 
 namespace Apps.Document360.Models.Requests;
 
-public class DownloadArticleRequest : WorkspaceIdentifier, IDownloadContentInput
+public class DownloadArticleRequest : WorkspaceOptionalIdentifier, IDownloadContentInput
 {
     [Display("Article ID", Description = "The article to download. The workspace decides which articles are listed.")]
     [DataSource(typeof(ArticleDataHandler))]

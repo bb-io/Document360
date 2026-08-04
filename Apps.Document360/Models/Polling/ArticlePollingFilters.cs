@@ -7,8 +7,15 @@ using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Document360.Models.Polling;
 
-public class ArticlesCreatedFilter : WorkspaceIdentifier
+public class ArticlesCreatedFilter
 {
+    [Display("Workspace ID",
+        Description =
+            "The workspace, called a project version in Document360, to work in. Required by the actions that " +
+            "work on a whole workspace; on the others it only narrows the lists of articles and locales offered.")]
+    [DataSource(typeof(WorkspaceDataHandler))]
+    public string WorkspaceId { get; set; } = string.Empty;
+    
     [Display("Locale", Description = "The language to watch. Left empty, the workspace's own language is watched.")]
     [DataSource(typeof(LocaleDataHandler))]
     public string? Locale { get; set; }
@@ -26,8 +33,15 @@ public class ArticlesCreatedFilter : WorkspaceIdentifier
     public string? Visibility { get; set; }
 }
 
-public class ArticlesPublishedFilter : WorkspaceIdentifier
+public class ArticlesPublishedFilter
 {
+    [Display("Workspace ID",
+        Description =
+            "The workspace, called a project version in Document360, to work in. Required by the actions that " +
+            "work on a whole workspace; on the others it only narrows the lists of articles and locales offered.")]
+    [DataSource(typeof(WorkspaceDataHandler))]
+    public string WorkspaceId { get; set; } = string.Empty;
+    
     [Display("Locale", Description = "The language to watch. Left empty, the workspace's own language is watched.")]
     [DataSource(typeof(LocaleDataHandler))]
     public string? Locale { get; set; }

@@ -18,7 +18,7 @@ public class WorkspaceOptionalTests : TestBase
     [TestMethod]
     public async Task GetArticleInfo_WithoutWorkspace_Works()
     {
-        var result = await Actions.GetArticleInfo(new GetArticleInfoRequest
+        var result = await Actions.GetArticleInfo(new GetArticleOptionalInfoRequest
         {
             ArticleId = TestData.MarkdownArticleId,
             Locale = TestData.SourceLocale
@@ -73,7 +73,7 @@ public class WorkspaceOptionalTests : TestBase
     [TestMethod]
     public async Task PublishArticle_WithoutWorkspace_Works()
     {
-        var result = await Actions.PublishArticle(new PublishArticleRequest
+        var result = await Actions.PublishArticle(new PublishArticleOptionalRequest
         {
             ArticleId = TestData.MarkdownArticleId,
             Locale = TestData.SourceLocale,
@@ -89,7 +89,7 @@ public class WorkspaceOptionalTests : TestBase
     [TestMethod]
     public async Task UpdateArticle_WithoutWorkspace_Works()
     {
-        var result = await Actions.UpdateArticle(new UpdateArticleRequest
+        var result = await Actions.UpdateArticle(new UpdateArticleOptionalRequest
         {
             ArticleId = TestData.MarkdownArticleId,
             Locale = TestData.TargetLocale,

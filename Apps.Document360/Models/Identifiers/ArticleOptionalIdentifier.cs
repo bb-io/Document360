@@ -4,7 +4,7 @@ using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Document360.Models.Identifiers;
 
-public class ArticleIdentifier : WorkspaceIdentifier
+public class ArticleOptionalIdentifier : WorkspaceOptionalIdentifier
 {
     [Display("Article ID", Description = "The article to work with. The workspace decides which articles are listed.")]
     [DataSource(typeof(ArticleDataHandler))]

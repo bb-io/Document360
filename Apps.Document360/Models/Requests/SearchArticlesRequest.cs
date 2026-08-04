@@ -7,8 +7,15 @@ using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Document360.Models.Requests;
 
-public class SearchArticlesRequest : WorkspaceIdentifier
+public class SearchArticlesRequest
 {
+    [Display("Workspace ID",
+        Description =
+            "The workspace, called a project version in Document360, to work in. Required by the actions that " +
+            "work on a whole workspace; on the others it only narrows the lists of articles and locales offered.")]
+    [DataSource(typeof(WorkspaceDataHandler))]
+    public string WorkspaceId { get; set; } = string.Empty;
+    
     [Display("Locale",
         Description = "The language whose translation state is reported. Left empty, the workspace's own language is used.")]
     [DataSource(typeof(LocaleDataHandler))]

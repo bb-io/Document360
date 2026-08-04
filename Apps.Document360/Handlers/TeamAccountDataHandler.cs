@@ -16,8 +16,6 @@ public class TeamAccountDataHandler(InvocationContext invocationContext)
     public async Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context,
         CancellationToken cancellationToken)
     {
-
-
         var members = await Client.GetSkipTakeListAsync<TeamMemberDto>(
             (skip, take) => new RestRequest("/v2/Teams", Method.Get)
                 .AddQueryParameter("skip", skip.ToString())

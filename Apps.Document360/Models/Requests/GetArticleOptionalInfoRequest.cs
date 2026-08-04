@@ -3,7 +3,7 @@ using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Document360.Models.Requests;
 
-public class GetArticleInfoRequest : ArticleIdentifier
+public class GetArticleOptionalInfoRequest : ArticleOptionalIdentifier
 {
     [Display("Use published version",
         Description = "Turn on to describe the version that is live on the site instead of the newest draft.")]

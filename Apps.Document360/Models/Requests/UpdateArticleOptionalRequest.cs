@@ -8,7 +8,7 @@ using Blackbird.Applications.Sdk.Common.Files;
 
 namespace Apps.Document360.Models.Requests;
 
-public class UpdateArticleRequest : ArticleIdentifier
+public class UpdateArticleOptionalRequest : ArticleOptionalIdentifier
 {
     [Display("Title", Description = "A new title for this translation. Left empty, the title is kept.")]
     public string? Title { get; set; }

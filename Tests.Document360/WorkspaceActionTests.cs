@@ -27,7 +27,7 @@ public class WorkspaceActionTests : TestBase
     [TestMethod]
     public async Task SearchWorkspaceLocales_ReturnsExactlyOneDefault()
     {
-        var result = await Actions.SearchWorkspaceLocales(new WorkspaceIdentifier
+        var result = await Actions.SearchWorkspaceLocales(new WorkspaceOptionalIdentifier
         {
             WorkspaceId = TestData.WorkspaceId
         });

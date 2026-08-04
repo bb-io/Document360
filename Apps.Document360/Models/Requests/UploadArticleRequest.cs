@@ -7,7 +7,7 @@ using Blackbird.Applications.SDK.Blueprints.Interfaces.CMS;
 
 namespace Apps.Document360.Models.Requests;
 
-public class UploadArticleRequest : WorkspaceIdentifier, IUploadContentInput
+public class UploadArticleRequest : WorkspaceOptionalIdentifier, IUploadContentInput
 {
     [Display("File",
         Description = "The translated file to write back. Accepts the HTML file from 'Download article', or an XLIFF file.")]

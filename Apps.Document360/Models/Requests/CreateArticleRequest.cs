@@ -8,8 +8,15 @@ using Blackbird.Applications.Sdk.Common.Files;
 
 namespace Apps.Document360.Models.Requests;
 
-public class CreateArticleRequest : WorkspaceIdentifier
+public class CreateArticleRequest
 {
+    [Display("Workspace ID",
+        Description =
+            "The workspace, called a project version in Document360, to work in. Required by the actions that " +
+            "work on a whole workspace; on the others it only narrows the lists of articles and locales offered.")]
+    [DataSource(typeof(WorkspaceDataHandler))]
+    public string WorkspaceId { get; set; } = string.Empty;
+    
     [Display("Title", Description = "The article title. It also seeds the article address and the SEO title.")]
     public string Title { get; set; } = string.Empty;
 

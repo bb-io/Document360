@@ -123,7 +123,7 @@ public class ArticleRoundtripTests : TestBase
         });
         
 
-        var stored = await Actions.GetArticleInfo(new GetArticleInfoRequest
+        var stored = await Actions.GetArticleInfo(new GetArticleOptionalInfoRequest
         {
             WorkspaceId = TestData.WorkspaceId,
             ArticleId = TestData.MarkdownArticleId,

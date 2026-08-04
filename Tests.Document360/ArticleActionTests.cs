@@ -59,7 +59,7 @@ public class ArticleActionTests : TestBase
     [TestMethod]
     public async Task UpdateArticle_TranslationFromFile_UpdatesTranslation()
     {
-        var result = await Actions.UpdateArticle(new UpdateArticleRequest
+        var result = await Actions.UpdateArticle(new UpdateArticleOptionalRequest
         {
             WorkspaceId = TestData.WorkspaceId,
             ArticleId = TestData.MarkdownArticleId,
@@ -85,14 +85,14 @@ public class ArticleActionTests : TestBase
     [TestMethod]
     public async Task UpdateArticle_TagsOnly_KeepsContent()
     {
-        var before = await Actions.GetArticleInfo(new GetArticleInfoRequest
+        var before = await Actions.GetArticleInfo(new GetArticleOptionalInfoRequest
         {
             WorkspaceId = TestData.WorkspaceId,
             ArticleId = TestData.MarkdownArticleId,
             Locale = TestData.TargetLocale
         });
 
-        var result = await Actions.UpdateArticle(new UpdateArticleRequest
+        var result = await Actions.UpdateArticle(new UpdateArticleOptionalRequest
         {
             WorkspaceId = TestData.WorkspaceId,
             ArticleId = TestData.MarkdownArticleId,
@@ -109,7 +109,7 @@ public class ArticleActionTests : TestBase
     [TestMethod]
     public async Task PublishArticle_NoVersionGiven_PublishesLatest()
     {
-        var result = await Actions.PublishArticle(new PublishArticleRequest
+        var result = await Actions.PublishArticle(new PublishArticleOptionalRequest
         {
             WorkspaceId = TestData.WorkspaceId,
             ArticleId = TestData.MarkdownArticleId,
@@ -131,7 +131,7 @@ public class ArticleActionTests : TestBase
     [TestMethod]
     public async Task GetArticleInfo_ExistingTranslation_ReturnsMetadata()
     {
-        var result = await Actions.GetArticleInfo(new GetArticleInfoRequest
+        var result = await Actions.GetArticleInfo(new GetArticleOptionalInfoRequest
         {
             WorkspaceId = TestData.WorkspaceId,
             ArticleId = TestData.MarkdownArticleId,

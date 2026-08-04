@@ -3,6 +3,7 @@ using Apps.Document360.Extensions;
 using Apps.Document360.Providers;
 using Apps.Document360.Utils;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Document360.Handlers;
@@ -15,7 +16,10 @@ public abstract class ArticleVersionDataHandlerBase(InvocationContext invocation
         CancellationToken cancellationToken)
     {
         var (articleId, locale) = Target;
-        if (string.IsNullOrWhiteSpace(articleId) || string.IsNullOrWhiteSpace(locale)) return [];
+        if (string.IsNullOrWhiteSpace(articleId) || string.IsNullOrWhiteSpace(locale))
+        {
+            throw new PluginMisconfigurationException("Please provide article ID and locale first.");
+        }
 
         var versions = await ArticleProvider.GetArticleVersionsAsync(Client, articleId, locale, cancellationToken);
 

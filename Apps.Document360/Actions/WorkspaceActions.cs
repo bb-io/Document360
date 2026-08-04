@@ -24,9 +24,9 @@ public class WorkspaceActions(InvocationContext invocationContext) : Invocable(i
 
     [Action("Search workspace locales", Description = "Get the languages enabled for one workspace.")]
     public async Task<SearchWorkspaceLocalesResponse> SearchWorkspaceLocales(
-        [ActionParameter] WorkspaceIdentifier identifier)
+        [ActionParameter] WorkspaceOptionalIdentifier optionalIdentifier)
     {
-        var workspaceId = Validate.Workspace(identifier);
+        var workspaceId = Validate.Workspace(optionalIdentifier);
 
         var locales = await ProjectProvider.GetWorkspaceLocalesAsync(Client, workspaceId);
         var results = locales.Select(locale => new LocaleResponse(locale)).ToList();
