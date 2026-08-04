@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Apps.Document360.Constants;
 using Apps.Document360.Models.Entities;
 using Blackbird.Filters.Coders;
@@ -9,10 +9,7 @@ using Newtonsoft.Json;
 
 namespace Apps.Document360.Utils;
 
-/// <summary>
-/// Turns an article translation into one self-describing HTML file. Every node carries what it holds and how to put
-/// it back, so "Upload article" never has to guess the shape of the article it is restoring.
-/// </summary>
+
 public static class ArticleHtmlBuilder
 {
     private const int DescriptionMaxLength = 250;
@@ -28,7 +25,7 @@ public static class ArticleHtmlBuilder
         var body = document.CreateElement("body");
         html.AppendChild(body);
 
-        // ITS review provenance, for tools that show who last touched the source.
+
         body.SetAttributeValue("its-rev-tool", ArticleContentAttributes.SystemName);
         body.SetAttributeValue("its-rev-tool-ref", systemRef);
         if (!string.IsNullOrWhiteSpace(revisedBy)) body.SetAttributeValue("its-rev-person", revisedBy);
@@ -47,8 +44,7 @@ public static class ArticleHtmlBuilder
         AppendTextField(document, container, fields.ArticleId, ArticleContentAttributes.FieldIds.MetaDescription,
             fields.MetaDescription, "div");
 
-        // The coder writes the blackbird-* metadata and <html lang> for us, keeping the file in step with what the
-        // upload side, other Blackbird apps and the content lake expect.
+
         var coder = new HtmlCoder();
         var content = coder.Deserialize(document.DocumentNode.OuterHtml, fileName);
 
@@ -65,7 +61,7 @@ public static class ArticleHtmlBuilder
         return coder.Serialize(content, MetadataHandling.Include);
     }
 
-    /// <summary>Names the file so that source and target files of the same article pair up on their locale.</summary>
+
     public static string BuildFileName(string? title, string articleId, string locale)
     {
         var invalid = Path.GetInvalidFileNameChars();
@@ -96,8 +92,7 @@ public static class ArticleHtmlBuilder
         Describe(node, fields.ArticleId, ArticleContentAttributes.FieldIds.Content,
             isMarkdown ? ArticleContentAttributes.FieldTypes.Markdown : ArticleContentAttributes.FieldTypes.Html);
 
-        // The untranslated body travels along so that upload can restore everything the translatable text does not
-        // carry: blank lines, indentation, and the exact markup of anything nobody edited.
+
         node.SetAttributeValue(ArticleContentAttributes.SourceValue, Encode(fields.Body));
 
         if (isMarkdown)
@@ -108,10 +103,7 @@ public static class ArticleHtmlBuilder
         container.AppendChild(node);
     }
 
-    /// <summary>
-    /// A markdown body becomes one node per line. Whitespace inside a single translatable block is not preserved by
-    /// translation tools, so a heading, a list item and a paragraph each get their own segment instead.
-    /// </summary>
+
     private static void AppendMarkdownLines(HtmlDocument document, HtmlNode node, ArticleTranslatableFields fields)
     {
         var lines = SplitLines(fields.Body!);

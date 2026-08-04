@@ -1,11 +1,8 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Document360.Models.Dtos;
 
-/// <summary>
-/// A workspace (project version) from <c>GET /v2/ProjectVersions</c>. There is no <c>name</c> field —
-/// <c>version_code_name</c> is the human label.
-/// </summary>
+
 public class ProjectVersionDto
 {
     [JsonProperty("id")] public string Id { get; set; } = string.Empty;

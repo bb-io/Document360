@@ -1,4 +1,4 @@
-using Apps.Document360.Models.Identifiers;
+﻿using Apps.Document360.Models.Identifiers;
 using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Document360.Models.Requests;

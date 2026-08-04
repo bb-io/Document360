@@ -1,4 +1,4 @@
-using Apps.Document360.Api;
+﻿using Apps.Document360.Api;
 using Apps.Document360.Extensions;
 using Apps.Document360.Models.Identifiers;
 using Blackbird.Applications.Sdk.Common;
@@ -8,11 +8,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Document360.Handlers;
 
-/// <summary>
-/// Articles of the selected workspace. Document360 offers no title search, so the list is fetched and filtered
-/// here; a workspace can hold hundreds of articles, which is why an Article ID can also be typed or mapped
-/// from an earlier workflow step instead of picked.
-/// </summary>
+
 public class ArticleDataHandler(InvocationContext invocationContext, [ActionParameter] WorkspaceIdentifier workspace)
     : Invocable(invocationContext), IAsyncDataSourceItemHandler
 {

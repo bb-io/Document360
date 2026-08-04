@@ -1,4 +1,4 @@
-using Apps.Document360.Events;
+﻿using Apps.Document360.Events;
 using Apps.Document360.Models.Polling;
 using Apps.Document360.Models.Responses;
 using Blackbird.Applications.Sdk.Common.Polling;
@@ -123,10 +123,7 @@ public class ArticlePollingTests : TestBase
         Assert.IsTrue(result.Result.Items.All(x => x.PublishedVersion > 0));
     }
 
-    /// <summary>
-    /// A workflow built on another CMS can only be pointed at Document360 when the event carries the blueprint and
-    /// every item it outputs exposes a content id the blueprint's download action can use.
-    /// </summary>
+
     [TestMethod]
     public async Task OnArticlesPublished_FulfilsTheContentCreatedOrUpdatedBlueprint()
     {

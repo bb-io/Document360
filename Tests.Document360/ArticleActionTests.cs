@@ -1,4 +1,4 @@
-using Apps.Document360.Actions;
+﻿using Apps.Document360.Actions;
 using Apps.Document360.Models.Requests;
 using Blackbird.Applications.Sdk.Common.Files;
 using Tests.Document360.Base;
@@ -97,13 +97,12 @@ public class ArticleActionTests : TestBase
         Console.WriteLine($"Published version {result.PublishedVersion} at {result.ArticleUrl} ({result.Status}), " +
                           $"already live: {result.WasAlreadyLive}");
 
-        // Re-running the workflow on a version that is already live has to succeed rather than fail.
+
         Assert.IsFalse(string.IsNullOrWhiteSpace(result.ArticleUrl));
         Assert.IsTrue(result.PublishedVersion > 0);
         Assert.AreEqual("Published", result.Status);
     }
 
-    // "Download article" and "Upload article" are covered by ArticleRoundtripTests.
 
     [TestMethod]
     public async Task GetArticleInfo_ExistingTranslation_ReturnsMetadata()

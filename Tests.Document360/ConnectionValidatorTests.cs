@@ -1,4 +1,4 @@
-using Apps.Document360.Connections;
+﻿using Apps.Document360.Connections;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Tests.Document360.Base;
 

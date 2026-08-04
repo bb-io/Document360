@@ -1,4 +1,4 @@
-using Apps.Document360.Constants;
+﻿using Apps.Document360.Constants;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Connections;
 

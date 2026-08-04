@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using Apps.Document360.Constants;
 using Apps.Document360.Models.Dtos;
 using Blackbird.Applications.Sdk.Common.Authentication;
@@ -11,28 +11,17 @@ using RestSharp;
 
 namespace Apps.Document360.Api;
 
-/// <summary>
-/// Transport for the Document360 Customer API v2. It owns authentication, the response envelope, paging, throttling
-/// and the translation of failures into Blackbird exceptions — and knows nothing about articles, workspaces or any
-/// other kind of content. Each endpoint is built by the action, event or data source that needs it.
-/// </summary>
-/// <remarks>
-/// Three vendor quirks are handled here: every payload is wrapped in an envelope, a failed operation can arrive
-/// with HTTP 200 and <c>success: false</c>, and an invalid token answers 401 with a plain-text body.
-/// </remarks>
+
 public class Document360Client : BlackBirdRestClient
 {
-    /// <summary>The largest page size the paged endpoints accept.</summary>
+
     public const int MaxPageSize = 100;
 
     private const int RetryCount = 8;
     private const int BaseBackoffSeconds = 1;
     private const int MaxBackoffSeconds = 16;
 
-    /// <summary>
-    /// Document360 allows roughly 100 requests per window, which a workflow over a few dozen articles walks straight
-    /// through. A throttled request is backed off and retried rather than failing the run.
-    /// </summary>
+
     private readonly AsyncRetryPolicy<RestResponse> retryPolicy = Policy
         .HandleResult<RestResponse>(response => response.StatusCode == HttpStatusCode.TooManyRequests)
         .WaitAndRetryAsync(RetryCount, (retryAttempt, result, _) => GetRetryDelay(retryAttempt, result.Result),
@@ -46,15 +35,15 @@ public class Document360Client : BlackBirdRestClient
     {
         ApiHubUrl = ResolveBaseUrl(creds);
 
-        // The token contains '+', '/' and '=' and must travel verbatim.
+
         this.AddDefaultHeader("api_token", ResolveApiToken(creds));
         this.AddDefaultHeader("Accept", "application/json");
     }
 
-    /// <summary>The regional API hub this connection talks to.</summary>
+
     public Uri ApiHubUrl { get; }
 
-    /// <summary>Sends the request and returns the payload, failing when Document360 reports no data.</summary>
+
     public async Task<T> GetDataAsync<T>(RestRequest request, CancellationToken cancellationToken = default)
         where T : class
     {
@@ -65,17 +54,14 @@ public class Document360Client : BlackBirdRestClient
                    "Document360 reported success but returned no data. Please try running the action again.");
     }
 
-    /// <summary>Sends the request and returns the payload as a list, empty when there is nothing to return.</summary>
+
     public async Task<List<T>> GetListAsync<T>(RestRequest request, CancellationToken cancellationToken = default)
     {
         var envelope = await SendAsync<List<T>>(request, cancellationToken);
         return envelope.Payload ?? [];
     }
 
-    /// <summary>
-    /// Walks a page-based endpoint until it reports no more results. The caller builds each page's request so it
-    /// can add its own query parameters; the zero-based page index is handed in.
-    /// </summary>
+
     public async Task<List<T>> GetPagedListAsync<T>(Func<int, RestRequest> buildRequest, int maxPages,
         CancellationToken cancellationToken = default)
     {
@@ -93,10 +79,7 @@ public class Document360Client : BlackBirdRestClient
         return results;
     }
 
-    /// <summary>
-    /// Walks a skip/take endpoint. The page size Document360 actually honours is learnt from the first response,
-    /// because it caps <c>take</c> server-side without saying so.
-    /// </summary>
+
     public async Task<List<T>> GetSkipTakeListAsync<T>(Func<int, int, RestRequest> buildRequest, int pageSize,
         int maxPages, CancellationToken cancellationToken = default)
     {
@@ -117,7 +100,7 @@ public class Document360Client : BlackBirdRestClient
         return results;
     }
 
-    /// <summary>Sends the request and fails when the operation did not succeed.</summary>
+
     public async Task<Document360Response<T>> SendAsync<T>(RestRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -130,11 +113,7 @@ public class Document360Client : BlackBirdRestClient
         return envelope;
     }
 
-    /// <summary>
-    /// Sends the request and hands back the envelope even when the operation failed, so a caller can react to a
-    /// particular vendor message instead of surfacing it. Anything that is not a readable business failure — a
-    /// rejected token, an outage, an unreachable host — is still raised.
-    /// </summary>
+
     public async Task<Document360Response<T>> SendUncheckedAsync<T>(RestRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -150,7 +129,7 @@ public class Document360Client : BlackBirdRestClient
         throw ConfigureErrorException(response);
     }
 
-    /// <summary>Turns a vendor failure message into the exception the user should see.</summary>
+
     public Exception BuildFailureException(string? message)
     {
         if (string.IsNullOrWhiteSpace(message))
@@ -167,7 +146,7 @@ public class Document360Client : BlackBirdRestClient
 
     protected override Exception ConfigureErrorException(RestResponse response)
     {
-        // An invalid or missing token answers 401 with the plain text "Invalid API token" — no JSON to parse.
+
         if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
             return new PluginMisconfigurationException(
                 "Document360 rejected the API token. Check the token in your connection and make sure the API hub " +
@@ -186,23 +165,23 @@ public class Document360Client : BlackBirdRestClient
         return BuildFailureException(message);
     }
 
-    /// <summary>The single point every request passes through, so throttling is handled once for the whole app.</summary>
+
     private Task<RestResponse> ExecuteWithRetryAsync(RestRequest request, CancellationToken cancellationToken) =>
         retryPolicy.ExecuteAsync(() => ExecuteAsync(request, cancellationToken));
 
     private static TimeSpan GetRetryDelay(int retryAttempt, RestResponse? response)
     {
-        // The server's own advice comes first when it gives any.
+
         var retryAfter = response?.Headers?
             .FirstOrDefault(header => string.Equals(header.Name, "Retry-After", StringComparison.OrdinalIgnoreCase))?
             .Value?.ToString();
 
         if (int.TryParse(retryAfter, out var seconds) && seconds > 0) return TimeSpan.FromSeconds(seconds);
 
-        // Otherwise back off exponentially, capped, to ride out the window rather than walking back into it.
+
         var backoff = Math.Min(BaseBackoffSeconds * Math.Pow(2, retryAttempt - 1), MaxBackoffSeconds);
 
-        // Jitter keeps several workflows throttled at the same moment from retrying in lockstep.
+
         return TimeSpan.FromSeconds(backoff) + TimeSpan.FromMilliseconds(Random.Shared.Next(0, 500));
     }
 

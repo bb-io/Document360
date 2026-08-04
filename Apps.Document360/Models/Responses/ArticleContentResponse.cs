@@ -1,14 +1,10 @@
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.SDK.Blueprints.Interfaces.CMS;
 
 namespace Apps.Document360.Models.Responses;
 
-/// <summary>
-/// The result of both halves of the translation round trip. Download returns the file it produced; upload returns
-/// the file it wrote back, stamped with where the content now lives, which is what a following "add to lake" step
-/// consumes.
-/// </summary>
+
 public class ArticleContentResponse : IDownloadContentOutput
 {
     [Display("File")] public FileReference Content { get; set; } = default!;

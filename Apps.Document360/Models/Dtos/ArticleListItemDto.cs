@@ -1,11 +1,8 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Document360.Models.Dtos;
 
-/// <summary>
-/// One entry of <c>GET /v2/ProjectVersions/{projectVersionId}/articles</c>. The list payload carries neither the
-/// article body nor its tags or category.
-/// </summary>
+
 public class ArticleListItemDto
 {
     [JsonProperty("id")] public string Id { get; set; } = string.Empty;

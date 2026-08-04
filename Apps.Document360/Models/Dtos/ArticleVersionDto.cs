@@ -1,11 +1,8 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Document360.Models.Dtos;
 
-/// <summary>
-/// One version of an article translation. Returned by <c>GET /v2/Articles/{id}/{lang}/versions</c> and by the
-/// fork endpoint (which returns the newly created version).
-/// </summary>
+
 public class ArticleVersionDto
 {
     [JsonProperty("version_number")] public int VersionNumber { get; set; }

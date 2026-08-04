@@ -1,14 +1,11 @@
-using Apps.Document360.Actions;
+﻿using Apps.Document360.Actions;
 using Apps.Document360.Models.Requests;
 using Blackbird.Applications.Sdk.Common.Files;
 using Tests.Document360.Base;
 
 namespace Tests.Document360;
 
-/// <summary>
-/// The download/upload translation round trip. The decisive test is the golden invariant: downloading and uploading
-/// again without editing anything must leave the article untouched.
-/// </summary>
+
 [TestClass]
 public class ArticleRoundtripTests : TestBase
 {
@@ -39,14 +36,14 @@ public class ArticleRoundtripTests : TestBase
         Assert.IsTrue(result.Content.Name.EndsWith($"_{TestData.SourceLocale}.html"),
             "The file name has to end with the locale so source and target files pair up.");
 
-        // The head metadata the upload side and the content lake read back.
+
         Assert.IsTrue(html.Contains($"lang=\"{TestData.SourceLocale}\""), "The locale belongs in <html lang>.");
         Assert.IsTrue(html.Contains("name=\"blackbird-ucid\""), "The article id belongs in blackbird-ucid.");
         Assert.IsTrue(html.Contains($"content=\"{TestData.MarkdownArticleId}\""));
         Assert.IsTrue(html.Contains("blackbird-content-name"));
         Assert.IsTrue(html.Contains("blackbird-system-name"));
 
-        // The reconstruction attributes.
+
         Assert.IsTrue(html.Contains($"data-document360-article-id=\"{TestData.MarkdownArticleId}\""));
         Assert.IsTrue(html.Contains("data-document360-field-id=\"title\""));
         Assert.IsTrue(html.Contains("data-document360-field-id=\"content\""));
@@ -86,7 +83,7 @@ public class ArticleRoundtripTests : TestBase
         Assert.IsTrue(exception.Message.Contains("not enabled for this workspace"));
     }
 
-    /// <summary>The golden invariant: a round trip with no edits must not touch the article.</summary>
+
     [TestMethod]
     public async Task UploadArticle_WithoutEdits_ChangesNothing()
     {
@@ -119,7 +116,7 @@ public class ArticleRoundtripTests : TestBase
         var stamp = DateTime.UtcNow.ToString("HHmmss");
         var translatedTitle = $"Titre traduit {stamp}";
 
-        // Replace the title text and the first body line, the way a translation app would.
+
         var edited = ReplaceFirstElementText(html, "h1", translatedTitle);
         edited = ReplaceFirstElementText(edited, "p", $"## Apercu traduit {stamp}");
 
@@ -140,7 +137,7 @@ public class ArticleRoundtripTests : TestBase
         Assert.IsTrue(result.UpdatedFields.Contains("Content"));
         Assert.AreEqual("Draft", result.Status);
 
-        // Confirm against the API that only the translated values landed, with the markdown structure intact.
+
         var stored = await Actions.GetArticleInfo(new GetArticleInfoRequest
         {
             WorkspaceId = TestData.WorkspaceId,

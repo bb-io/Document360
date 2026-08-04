@@ -1,4 +1,4 @@
-using System.Net.Mime;
+﻿using System.Net.Mime;
 using System.Text;
 using Apps.Document360.Api;
 using Apps.Document360.Constants;
@@ -357,7 +357,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         return new SearchArticlesResponse { Articles = results, TotalCount = results.Count };
     }
 
-    /// <summary>One article translation, as it is stored right now or as it was last published.</summary>
+
     private Task<ArticleDto> GetArticleAsync(string articleId, string langCode, bool isPublished = false,
         bool isForDisplay = false) =>
         Client.GetDataAsync<ArticleDto>(new RestRequest($"/v2/Articles/{articleId}/{langCode}", Method.Get)
@@ -375,11 +375,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
     private Task<CreatedArticleDto> CreateArticleAsync(Dictionary<string, object> body) =>
         Client.GetDataAsync<CreatedArticleDto>(new RestRequest("/v2/Articles", Method.Post).AddJsonBody(body));
 
-    /// <summary>
-    /// Writes title, content, placement and translation status. Returns <c>false</c> — instead of throwing — when
-    /// Document360 refuses the write because the target version is read-only, which is the signal to copy the
-    /// version into a new draft and try again.
-    /// </summary>
+
     private async Task<bool> TryUpdateArticleAsync(string articleId, string langCode,
         Dictionary<string, object> body)
     {
@@ -392,15 +388,12 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         throw Client.BuildFailureException(envelope.ErrorMessage);
     }
 
-    /// <summary>Creates a new writable draft version of an article translation.</summary>
+
     private Task<ArticleVersionDto> ForkArticleAsync(string articleId, Dictionary<string, object> body) =>
         Client.GetDataAsync<ArticleVersionDto>(
             new RestRequest($"/v2/Articles/{articleId}/fork", Method.Put).AddJsonBody(body));
 
-    /// <summary>
-    /// Sets the article description. The value travels as a query parameter, and re-sending an unchanged
-    /// description answers <c>success: false</c> with an empty error list, which is a no-op rather than a failure.
-    /// </summary>
+
     private async Task UpdateArticleDescriptionAsync(string articleId, string langCode, string description)
     {
         var request = new RestRequest($"/v2/Articles/{articleId}/{langCode}/updateDescription", Method.Put)
@@ -416,10 +409,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         Client.GetDataAsync<ArticleSettingsDto>(
             new RestRequest($"/v2/Articles/{articleId}/{langCode}/settings", Method.Put).AddJsonBody(body));
 
-    /// <summary>
-    /// Publishes a version. The public URL sits at the envelope root rather than inside <c>data</c>. Publishing a
-    /// version that is already live is reported as an outcome instead of raised, so re-running a workflow is safe.
-    /// </summary>
+
     private async Task<(bool WasAlreadyLive, string? Url)> PublishVersionAsync(string articleId, string langCode,
         Dictionary<string, object> body)
     {
@@ -432,7 +422,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
         throw Client.BuildFailureException(envelope.ErrorMessage);
     }
 
-    /// <summary>The IDs of the articles that are in a given translation state for a locale.</summary>
+
     private async Task<HashSet<string>> GetTranslationArticleIdsAsync(string workspaceId, string langCode, int status)
     {
         var request = new RestRequest($"/v2/Translations/{workspaceId}/{langCode}", Method.Get)
@@ -453,11 +443,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
     private static bool IsAlreadyPublished(string? message) =>
         message is not null && message.Contains("already been published", StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>
-    /// Writes the content fields, if there are any. Content can only be written to a draft, so a published,
-    /// unpublished or in-review version is copied into a new draft first — Document360 calls that forking.
-    /// </summary>
-    /// <returns>Whether the version had to be copied into a new draft.</returns>
+
     private async Task<bool> WriteArticleContentAsync(string articleId, string locale,
         Dictionary<string, object> contentBody, ArticleDto current, string? userId)
     {
@@ -518,10 +504,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
             MetaDescription = settings?.Description
         };
 
-    /// <summary>
-    /// Returns the file that was written back, stamped with where the content now lives. A following "add to lake"
-    /// step reads those references, which only exist once the article has actually been updated.
-    /// </summary>
+
     private async Task<FileReference> BuildUploadedFileAsync(UploadArticleRequest request,
         TransformationLoadResult loadResult, ArticleDto article)
     {
@@ -553,7 +536,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
             content.OriginalMediaType, content.OriginalName);
     }
 
-    /// <summary>The knowledge base site the article belongs to, falling back to the regional API hub.</summary>
+
     private string ResolveSystemReference(string? articleUrl) =>
         Uri.TryCreate(articleUrl, UriKind.Absolute, out var uri)
             ? $"{uri.Scheme}://{uri.Host}"
@@ -605,7 +588,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
             $"{string.Join(", ", locales.Select(x => x.LanguageCode))}.");
     }
 
-    /// <summary>Tags live only on the settings endpoint; losing them must not fail the whole action.</summary>
+
     private async Task<ArticleSettingsDto?> TryGetSettingsAsync(string articleId, string locale)
     {
         try
@@ -649,8 +632,7 @@ public class ArticleActions(InvocationContext invocationContext, IFileManagement
     {
         if (!string.IsNullOrWhiteSpace(editorFormat)) return Validate.Option(editorFormat, "Editor format");
 
-        // Markdown files are stored as markdown so that a later download returns markdown again. Anything else is
-        // left to the project default, which stores the body as HTML.
+
         var extension = Path.GetExtension(fileName ?? string.Empty).ToLowerInvariant();
         return extension is ".md" or ".markdown" ? Document360Enums.EditorFormatMarkdown : null;
     }

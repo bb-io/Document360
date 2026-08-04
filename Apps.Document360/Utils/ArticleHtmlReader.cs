@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using Apps.Document360.Constants;
 using Apps.Document360.Models.Entities;
@@ -6,11 +6,7 @@ using HtmlAgilityPack;
 
 namespace Apps.Document360.Utils;
 
-/// <summary>
-/// Reads a translated file back into article fields. It reverses <see cref="ArticleHtmlBuilder"/>: the structure of
-/// the article comes from the attributes in the file, never from guesswork, and anything nobody translated is
-/// restored from the untranslated value the file carries.
-/// </summary>
+
 public static partial class ArticleHtmlReader
 {
     public static ArticleTranslatableFields Read(string html)
@@ -24,7 +20,7 @@ public static partial class ArticleHtmlReader
 
         var fields = new ArticleTranslatableFields { ArticleId = ReadArticleId(document, container) };
 
-        // Only nodes that say both which field they hold and how to read it are ours.
+
         var fieldNodes = container.SelectNodes(
             $".//*[@{ArticleContentAttributes.FieldId}][@{ArticleContentAttributes.FieldType}]")?.ToList() ?? [];
 
@@ -59,7 +55,7 @@ public static partial class ArticleHtmlReader
         return fields;
     }
 
-    /// <summary>Collapses runs of whitespace, so a body is not rewritten just because a tool reflowed the markup.</summary>
+
     public static bool IsSameContent(string? left, string? right) =>
         Whitespace().Replace(left ?? string.Empty, " ").Trim() ==
         Whitespace().Replace(right ?? string.Empty, " ").Trim();
@@ -69,7 +65,7 @@ public static partial class ArticleHtmlReader
 
     private static string ReadArticleId(HtmlDocument document, HtmlNode container)
     {
-        // The article id lives in blackbird-ucid; the container attribute is the fallback for hand-made files.
+
         var ucid = document.DocumentNode
             .SelectSingleNode("//meta[@name='blackbird-ucid']")?
             .GetAttributeValue("content", string.Empty);
@@ -91,10 +87,7 @@ public static partial class ArticleHtmlReader
             : ReadHtmlBody(node, source);
     }
 
-    /// <summary>
-    /// Rebuilds the markdown from its translated lines, laid back over the untranslated body so blank lines and
-    /// indentation stay exactly as they were. A line nobody touched is restored character for character.
-    /// </summary>
+
     private static string ReadMarkdownBody(HtmlNode node, string? source)
     {
         var lineNodes = node.SelectNodes($".//*[@{ArticleContentAttributes.LineIndex}]")?.ToList() ?? [];
@@ -124,7 +117,7 @@ public static partial class ArticleHtmlReader
     {
         var translated = node.InnerHtml.Trim();
 
-        // Nothing was translated, so hand back the markup Document360 gave us rather than a reformatted copy.
+
         return source is not null && IsSameContent(translated, source) ? source : translated;
     }
 

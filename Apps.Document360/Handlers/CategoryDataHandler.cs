@@ -1,4 +1,4 @@
-using Apps.Document360.Extensions;
+﻿using Apps.Document360.Extensions;
 using Apps.Document360.Models.Dtos;
 using Apps.Document360.Models.Identifiers;
 using Blackbird.Applications.Sdk.Common;
@@ -9,10 +9,7 @@ using RestSharp;
 
 namespace Apps.Document360.Handlers;
 
-/// <summary>
-/// Categories of the selected workspace. Document360 returns a tree and category names repeat across branches,
-/// so the tree is flattened into full paths such as "Hardware / Accessories / Vehicle cameras".
-/// </summary>
+
 public class CategoryDataHandler(InvocationContext invocationContext, [ActionParameter] WorkspaceIdentifier workspace)
     : Invocable(invocationContext), IAsyncDataSourceItemHandler
 {
@@ -21,7 +18,7 @@ public class CategoryDataHandler(InvocationContext invocationContext, [ActionPar
     {
         if (string.IsNullOrWhiteSpace(workspace.WorkspaceId)) return [];
 
-        // The articles hanging off the tree are not needed to name a category, and a workspace can hold hundreds.
+
         var request = new RestRequest($"/v2/ProjectVersions/{workspace.WorkspaceId}/categories", Method.Get)
             .AddQueryParameter("excludeArticles", "true");
 

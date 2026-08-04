@@ -1,4 +1,4 @@
-using Apps.Document360.Models.Dtos;
+﻿using Apps.Document360.Models.Dtos;
 using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Document360.Models.Responses;

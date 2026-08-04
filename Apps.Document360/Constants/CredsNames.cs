@@ -1,4 +1,4 @@
-namespace Apps.Document360.Constants;
+﻿namespace Apps.Document360.Constants;
 
 public static class CredsNames
 {

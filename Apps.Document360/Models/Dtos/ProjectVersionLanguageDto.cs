@@ -1,8 +1,8 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Document360.Models.Dtos;
 
-/// <summary>A locale enabled on a workspace, as nested in the workspace list response.</summary>
+
 public class ProjectVersionLanguageDto
 {
     [JsonProperty("id")] public string Id { get; set; } = string.Empty;

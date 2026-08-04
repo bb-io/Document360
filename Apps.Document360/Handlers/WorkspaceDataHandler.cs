@@ -1,4 +1,4 @@
-using Apps.Document360.Api;
+﻿using Apps.Document360.Api;
 using Apps.Document360.Extensions;
 using Apps.Document360.Utils;
 using Blackbird.Applications.Sdk.Common.Dynamic;
@@ -16,7 +16,7 @@ public class WorkspaceDataHandler(InvocationContext invocationContext)
 
         return workspaces
             .Select(workspace => new DataSourceItem(workspace.Id,
-                // An API documentation workspace is named after the reference it documents, so its kind is spelled out.
+
                 workspace.VersionType == 1
                     ? $"{workspace.VersionCodeName} ({Document360Enums.WorkspaceType(workspace.VersionType)})"
                     : workspace.VersionCodeName ?? workspace.Id))

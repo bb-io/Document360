@@ -1,11 +1,8 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Document360.Models.Dtos;
 
-/// <summary>
-/// A category node from <c>GET /v2/ProjectVersions/{projectVersionId}/categories</c>. The response is a tree;
-/// <c>child_categories</c> has to be walked recursively.
-/// </summary>
+
 public class CategoryDto
 {
     [JsonProperty("id")] public string Id { get; set; } = string.Empty;

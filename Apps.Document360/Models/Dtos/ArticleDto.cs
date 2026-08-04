@@ -1,12 +1,8 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Document360.Models.Dtos;
 
-/// <summary>
-/// One article translation as returned by <c>GET /v2/Articles/{articleId}/{langCode}</c>. The version route
-/// (<c>/versions/{n}</c>) returns a reduced form of the same object: no <c>url</c>, no <c>available_languages</c>,
-/// empty <c>authors</c>, plus <c>version_created_at</c>.
-/// </summary>
+
 public class ArticleDto
 {
     [JsonProperty("id")] public string Id { get; set; } = string.Empty;
@@ -70,7 +66,7 @@ public class ArticleDto
 
     [JsonProperty("available_languages")] public List<AvailableLanguageDto>? AvailableLanguages { get; set; }
 
-    /// <summary>Dropdown custom field values resolved to their labels, keyed by field name.</summary>
+
     [JsonProperty("custom_fields_data")]
     public Dictionary<string, string?>? CustomFieldsData { get; set; }
 }

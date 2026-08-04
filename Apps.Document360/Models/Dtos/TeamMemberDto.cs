@@ -1,11 +1,8 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Document360.Models.Dtos;
 
-/// <summary>
-/// A team account from <c>GET /v2/Teams</c> — the only endpoint that returns its payload under <c>result</c>
-/// instead of <c>data</c>.
-/// </summary>
+
 public class TeamMemberDto
 {
     [JsonProperty("user_id")] public string UserId { get; set; } = string.Empty;

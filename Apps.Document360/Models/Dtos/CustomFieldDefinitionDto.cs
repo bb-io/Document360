@@ -1,8 +1,8 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Document360.Models.Dtos;
 
-/// <summary>One project-wide custom field definition from <c>GET /v2/customfields</c>.</summary>
+
 public class CustomFieldDefinitionDto
 {
     [JsonProperty("field_id")] public string FieldId { get; set; } = string.Empty;

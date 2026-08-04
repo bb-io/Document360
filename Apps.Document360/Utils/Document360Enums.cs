@@ -1,9 +1,6 @@
-namespace Apps.Document360.Utils;
+﻿namespace Apps.Document360.Utils;
 
-/// <summary>
-/// Document360 sends its enumerations as numbers. These helpers turn them into the readable labels the app
-/// shows, and keep the numeric constants the app has to send back.
-/// </summary>
+
 public static class Document360Enums
 {
     public const int EditorFormatMarkdown = 0;

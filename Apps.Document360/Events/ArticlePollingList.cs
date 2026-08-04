@@ -1,4 +1,4 @@
-using Apps.Document360.Api;
+﻿using Apps.Document360.Api;
 using Apps.Document360.Models.Dtos;
 using Apps.Document360.Models.Polling;
 using Apps.Document360.Models.Responses;
@@ -10,10 +10,7 @@ using Blackbird.Applications.SDK.Blueprints;
 
 namespace Apps.Document360.Events;
 
-/// <summary>
-/// Document360 has no webhooks for article changes, so both events poll the workspace's article list and compare
-/// it against what the previous run saw.
-/// </summary>
+
 [PollingEventList("Articles")]
 public class ArticlePollingList(InvocationContext invocationContext) : Invocable(invocationContext)
 {
@@ -25,14 +22,13 @@ public class ArticlePollingList(InvocationContext invocationContext) : Invocable
     {
         Validate.Workspace(filter);
 
-        // On the very first run there is nothing to compare against, so only the starting point is remembered.
+
         if (request.Memory?.LastPollingTime is null)
             return Respond(new PollingMemory { LastPollingTime = DateTime.UtcNow }, null, filter.WorkspaceId);
 
         var articles = await GetArticlesAsync(filter.WorkspaceId, filter.Locale, filter.Visibility);
 
-        // Stamped after the list was read, so an article created while it was being read is reported by this run
-        // instead of a second time by the next one.
+
         var memory = new PollingMemory { LastPollingTime = DateTime.UtcNow };
 
         var created = ArticleFilters.CreatedAfter(articles, request.Memory.LastPollingTime.Value);
@@ -61,7 +57,7 @@ public class ArticlePollingList(InvocationContext invocationContext) : Invocable
             PublishedVersions = SnapshotLiveVersions(articles)
         };
 
-        // The first run records which version of each article is live without triggering anything.
+
         if (request.Memory?.PublishedVersions is null) return Respond(memory, null, filter.WorkspaceId);
 
         var published = KeepNewlyLive(articles, request.Memory.PublishedVersions);
@@ -78,10 +74,7 @@ public class ArticlePollingList(InvocationContext invocationContext) : Invocable
             .GroupBy(article => article.Id)
             .ToDictionary(group => group.Key, group => group.Max(article => article.PublicVersion ?? 0));
 
-    /// <summary>
-    /// The articles that are live now and either were not live at the previous run, or are live at a higher
-    /// version than they were.
-    /// </summary>
+
     private static List<ArticleListItemDto> KeepNewlyLive(List<ArticleListItemDto> articles,
         Dictionary<string, int> previouslyLive) =>
         articles
@@ -94,10 +87,7 @@ public class ArticlePollingList(InvocationContext invocationContext) : Invocable
             })
             .ToList();
 
-    /// <summary>
-    /// Tags are not part of the article list, so each candidate needs one extra call. That is acceptable here
-    /// because a poll only ever looks at the handful of articles that changed.
-    /// </summary>
+
     private async Task<List<ArticleListItemDto>> KeepTaggedAsync(List<ArticleListItemDto> articles, string? locale,
         IEnumerable<string>? tags)
     {
@@ -128,10 +118,7 @@ public class ArticlePollingList(InvocationContext invocationContext) : Invocable
         return matches;
     }
 
-    /// <summary>
-    /// The one place a polling response is built, so the starting point of a first run and a run that found
-    /// nothing cannot drift apart: both remember the moment they ran, and neither flies the bird.
-    /// </summary>
+
     private static PollingEventResponse<TMemory, ArticlesEventResponse> Respond<TMemory>(TMemory memory,
         List<ArticleListItemDto>? articles, string workspaceId) where TMemory : PollingMemory
     {

@@ -1,4 +1,4 @@
-using Apps.Document360.Handlers;
+﻿using Apps.Document360.Handlers;
 using Apps.Document360.Models.Identifiers;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;

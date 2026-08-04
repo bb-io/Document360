@@ -1,9 +1,9 @@
-namespace Apps.Document360.Extensions;
+﻿namespace Apps.Document360.Extensions;
 
-/// <summary>Small helpers that keep request-body building free of walls of null checks.</summary>
+
 public static class DictionaryExtensions
 {
-    /// <summary>Adds the value when it is not null. An empty string is still sent.</summary>
+
     public static Dictionary<string, object> AddIfNotNull(this Dictionary<string, object> body, string key,
         string? value)
     {
@@ -11,7 +11,7 @@ public static class DictionaryExtensions
         return body;
     }
 
-    /// <summary>Adds the value only when it holds actual text.</summary>
+
     public static Dictionary<string, object> AddIfNotEmpty(this Dictionary<string, object> body, string key,
         string? value)
     {

@@ -1,11 +1,11 @@
-using Apps.Document360.Api;
+﻿using Apps.Document360.Api;
 using Apps.Document360.Extensions;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Document360.Handlers;
 
-/// <summary>The project's custom field definitions, used to pick which fields an update should write.</summary>
+
 public class CustomFieldDataHandler(InvocationContext invocationContext)
     : Invocable(invocationContext), IAsyncDataSourceItemHandler
 {

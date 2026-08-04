@@ -1,18 +1,15 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Document360.Models.Dtos;
 
-/// <summary>
-/// <c>GET /v2/Articles/{articleId}/{langCode}/settings</c>. Tags live only here, and this is the response that
-/// returns round-trippable custom field values (option IDs rather than labels).
-/// </summary>
+
 public class ArticleSettingsDto
 {
     [JsonProperty("slug")] public string? Slug { get; set; }
 
     [JsonProperty("seo_title")] public string? SeoTitle { get; set; }
 
-    /// <summary>The SEO meta description — a different field from the article description.</summary>
+
     [JsonProperty("description")]
     public string? Description { get; set; }
 

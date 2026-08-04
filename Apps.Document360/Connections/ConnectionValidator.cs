@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using Apps.Document360.Api;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Authentication;
@@ -21,7 +21,7 @@ public class ConnectionValidator(InvocationContext invocationContext)
             var response = await client.ExecuteAsync(new RestRequest("/v2/ProjectVersions", Method.Get),
                 cancellationToken);
 
-            // A wrong token, and a base URL from the wrong region, are both answered with 401 "Invalid API token".
+
             if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
                 return new ConnectionValidationResponse
                 {
@@ -31,7 +31,7 @@ public class ConnectionValidator(InvocationContext invocationContext)
                         "and that the API hub URL matches the region your knowledge base is hosted in."
                 };
 
-            // A host that cannot be reached at all means the API hub URL is wrong.
+
             if (response.ResponseStatus is ResponseStatus.Error)
                 return new ConnectionValidationResponse
                 {
@@ -41,8 +41,7 @@ public class ConnectionValidator(InvocationContext invocationContext)
                         $"({response.ErrorMessage ?? response.ResponseStatus.ToString()})"
                 };
 
-            // Anything else — a slow instance, an outage, a 5xx — is not a credential problem and must not
-            // block a user whose credentials are fine.
+
             return new ConnectionValidationResponse { IsValid = true, Message = "Success" };
         }
         catch (Exception ex)

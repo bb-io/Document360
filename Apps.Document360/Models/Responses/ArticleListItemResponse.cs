@@ -1,15 +1,11 @@
-using Apps.Document360.Models.Dtos;
+﻿using Apps.Document360.Models.Dtos;
 using Apps.Document360.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.SDK.Blueprints.Interfaces.CMS;
 
 namespace Apps.Document360.Models.Responses;
 
-/// <summary>
-/// One article as it appears in a list, whether returned by 'Search articles' or by an article event. It carries
-/// the article id under the blueprint's own name, so a result can be handed straight to 'Download article' — or to
-/// the equivalent action of any other CMS app.
-/// </summary>
+
 public class ArticleListItemResponse : IDownloadContentInput
 {
     public ArticleListItemResponse()

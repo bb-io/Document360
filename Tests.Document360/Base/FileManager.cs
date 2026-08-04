@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 
@@ -44,11 +44,11 @@ public class FileManager : IFileManagementClient
         return Task.FromResult(new FileReference { Name = fileName, ContentType = contentType });
     }
 
-    /// <summary>Reads back a file an action produced.</summary>
+
     public string ReadOutput(string fileName) =>
         File.ReadAllText(Path.Combine(outputFolder, fileName), Encoding.UTF8);
 
-    /// <summary>Places content where an action can pick it up as an input file.</summary>
+
     public FileReference WriteInput(string fileName, string content)
     {
         File.WriteAllText(Path.Combine(inputFolder, fileName), content, new UTF8Encoding(false));
@@ -60,6 +60,6 @@ public class FileManager : IFileManagementClient
         };
     }
 
-    /// <summary>Feeds a produced file straight back into an action, unchanged.</summary>
+
     public FileReference CopyOutputToInput(string fileName) => WriteInput(fileName, ReadOutput(fileName));
 }

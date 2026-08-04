@@ -1,4 +1,4 @@
-using Apps.Document360.Api;
+﻿using Apps.Document360.Api;
 using Apps.Document360.Extensions;
 using Apps.Document360.Utils;
 using Blackbird.Applications.Sdk.Common.Dynamic;
@@ -6,7 +6,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Document360.Handlers;
 
-/// <summary>Versions of an article translation, newest first. Subclasses say which article and locale to look at.</summary>
+
 public abstract class ArticleVersionDataHandlerBase(InvocationContext invocationContext)
     : Invocable(invocationContext), IAsyncDataSourceItemHandler
 {
