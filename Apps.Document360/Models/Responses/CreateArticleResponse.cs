@@ -29,6 +29,20 @@ public class CreateArticleResponse
         ModifiedAt = article.ModifiedAt;
     }
 
+    /// <summary>
+    /// The new article as it stands after it was also put live, so the outputs describe what is on the site rather
+    /// than the draft it was a moment earlier.
+    /// </summary>
+    public CreateArticleResponse(ArticleDto article, string locale, PublishArticleResponse published)
+        : this(article, locale)
+    {
+        WasPublished = true;
+        Status = published.Status;
+        PublishedVersion = published.PublishedVersion;
+
+        if (!string.IsNullOrWhiteSpace(published.ArticleUrl)) ArticleUrl = published.ArticleUrl;
+    }
+
     [Display("Article ID", Description = "Use this in every later step that works with the article.")]
     public string ArticleId { get; set; } = string.Empty;
 
@@ -53,6 +67,10 @@ public class CreateArticleResponse
 
     [Display("Published version", Description = "The version that is live on the site, or 0 while nothing is live.")]
     public int PublishedVersion { get; set; }
+
+    [Display("Was published",
+        Description = "Turned on when 'Publish' was used, so the article is live rather than an editable draft.")]
+    public bool WasPublished { get; set; }
 
     [Display("Editor format")] public string EditorFormat { get; set; } = string.Empty;
 

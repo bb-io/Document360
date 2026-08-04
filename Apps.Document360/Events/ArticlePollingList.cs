@@ -2,6 +2,7 @@
 using Apps.Document360.Models.Dtos;
 using Apps.Document360.Models.Polling;
 using Apps.Document360.Models.Responses;
+using Apps.Document360.Providers;
 using Apps.Document360.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Invocation;

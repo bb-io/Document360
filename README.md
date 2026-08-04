@@ -33,7 +33,7 @@ Every action that works with a single article asks for a **Workspace ID** as wel
 
 ### Articles
 
-- **Create draft article** — Creates a new draft article in a category, with its body taken from a file. Markdown files are stored as markdown so a later download returns markdown again; anything else is stored in the project's default editor format. Returns the new Article ID, its public address and the version numbers.
+- **Create article** — Creates a new article in a category, with its body taken from a file. Markdown files are stored as markdown so a later download returns markdown again; anything else is stored in the project's default editor format. The article is created as an editable draft; turn on **Publish** to put it live on the site in the same step, which reports **Was published** and the version that went live. Returns the new Article ID, its public address and the version numbers.
 - **Update article** — Writes new content and metadata to one article translation and leaves it as an editable draft. This is the localization return path: the first time it runs against a language that has never been translated, it creates that translation. Content can only be written to a draft, so when the newest version is published, unpublished or in review, the action copies it into a new draft first and reports that with **Was copied to new draft**. Supply either **File** or **Content**, not both. Anything you leave empty is preserved, including the category, so the source structure survives the round trip.
 - **Publish article** — Puts an article translation live and returns its public address. Leave **Version number** empty to publish the newest version. Publishing a version that is already live succeeds and reports **Was already live**, so re-running a workflow is safe.
 - **Download article** — Exports the translatable fields of an article translation — title, body, description, SEO title and meta description — as one HTML file, ready to be translated. See **Translating an article** below. Leave **Resolve merge codes** off for content you intend to write back, so snippets, variables and glossary codes survive.
@@ -56,7 +56,7 @@ These inputs are optional and can be left empty:
 
 | Action | Optional inputs |
 | --- | --- |
-| Create draft article | Editor format, Slug, Order |
+| Create article | Editor format, Slug, Order, Publish, Publish message |
 | Update article | Title, File, Content, Translation status, Hidden, Category ID, Order, Description, Tags, Custom field IDs, Custom field values, SEO title, Meta description, User ID |
 | Publish article | Version number, Publish message |
 | Download article | Use published version, Version number, Resolve merge codes, File name |

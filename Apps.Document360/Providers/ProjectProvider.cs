@@ -1,7 +1,8 @@
-﻿using Apps.Document360.Models.Dtos;
+﻿using Apps.Document360.Api;
+using Apps.Document360.Models.Dtos;
 using RestSharp;
 
-namespace Apps.Document360.Api;
+namespace Apps.Document360.Providers;
 
 
 public static class ProjectProvider

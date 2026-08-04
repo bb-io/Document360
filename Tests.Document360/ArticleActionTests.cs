@@ -11,9 +11,9 @@ public class ArticleActionTests : TestBase
     private ArticleActions Actions => new(InvocationContext, FileManager);
 
     [TestMethod]
-    public async Task CreateDraftArticle_MarkdownFile_CreatesDraft()
+    public async Task CreateArticle_MarkdownFile_CreatesDraft()
     {
-        var result = await Actions.CreateDraftArticle(new CreateDraftArticleRequest
+        var result = await Actions.CreateArticle(new CreateArticleRequest
         {
             WorkspaceId = TestData.WorkspaceId,
             CategoryId = TestData.CategoryId,
@@ -28,7 +28,32 @@ public class ArticleActionTests : TestBase
         Assert.AreEqual("Draft", result.Status);
         Assert.AreEqual("Markdown", result.EditorFormat);
         Assert.AreEqual(0, result.PublishedVersion);
+        Assert.IsFalse(result.WasPublished, "Without 'Publish' the article has to stay a draft.");
         Assert.AreEqual(TestData.WorkspaceId, result.WorkspaceId);
+    }
+
+    [TestMethod]
+    public async Task CreateArticle_WithPublish_CreatesLiveArticle()
+    {
+        var result = await Actions.CreateArticle(new CreateArticleRequest
+        {
+            WorkspaceId = TestData.WorkspaceId,
+            CategoryId = TestData.CategoryId,
+            UserId = TestData.UserId,
+            Title = $"Blackbird integration test published {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}",
+            File = new FileReference { Name = TestData.SampleMarkdownFileName, ContentType = "text/markdown" },
+            Publish = true,
+            PublishMessage = "Published on creation by the Blackbird integration tests."
+        });
+
+        Console.WriteLine($"Created {result.ArticleId} ({result.Status}) at {result.ArticleUrl}, " +
+                          $"live version {result.PublishedVersion}");
+
+        Assert.IsFalse(string.IsNullOrWhiteSpace(result.ArticleId));
+        Assert.IsTrue(result.WasPublished);
+        Assert.AreEqual("Published", result.Status);
+        Assert.IsTrue(result.PublishedVersion > 0, "A published article has to report the version that went live.");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(result.ArticleUrl));
     }
 
     [TestMethod]
