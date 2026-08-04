@@ -1,3 +1,5 @@
+using Apps.Document360.Api;
+using Apps.Document360.Extensions;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
@@ -10,17 +12,11 @@ public class CustomFieldDataHandler(InvocationContext invocationContext)
     public async Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context,
         CancellationToken cancellationToken)
     {
-        var definitions = await CustomFields.GetCustomFieldDefinitionsAsync(cancellationToken);
+        var definitions = await ProjectProvider.GetCustomFieldDefinitionsAsync(Client, cancellationToken);
 
         return definitions
-            .Select(definition => new
-            {
-                definition.FieldId,
-                Label = string.IsNullOrWhiteSpace(definition.Name) ? definition.FieldId : definition.Name
-            })
-            .Where(item => context.SearchString is null ||
-                           item.Label.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .Take(50)
-            .Select(item => new DataSourceItem(item.FieldId, item.Label));
+            .Select(definition => new DataSourceItem(definition.FieldId,
+                string.IsNullOrWhiteSpace(definition.Name) ? definition.FieldId : definition.Name))
+            .Matching(context);
     }
 }

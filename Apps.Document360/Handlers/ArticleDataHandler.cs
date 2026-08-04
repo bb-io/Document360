@@ -1,3 +1,5 @@
+using Apps.Document360.Api;
+using Apps.Document360.Extensions;
 using Apps.Document360.Models.Identifiers;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
@@ -21,18 +23,12 @@ public class ArticleDataHandler(InvocationContext invocationContext, [ActionPara
     {
         if (string.IsNullOrWhiteSpace(workspace.WorkspaceId)) return [];
 
-        var articles = await Articles.GetArticlesAsync(workspace.WorkspaceId, maxPages: MaxPagesToScan,
-            cancellationToken: cancellationToken);
+        var articles = await ArticleProvider.GetArticlesAsync(Client, workspace.WorkspaceId,
+            maxPages: MaxPagesToScan, cancellationToken: cancellationToken);
 
         return articles
-            .Select(article => new
-            {
-                article.Id,
-                Label = string.IsNullOrWhiteSpace(article.Title) ? article.Id : article.Title
-            })
-            .Where(item => context.SearchString is null ||
-                           item.Label.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .Take(50)
-            .Select(item => new DataSourceItem(item.Id, item.Label));
+            .Select(article => new DataSourceItem(article.Id,
+                string.IsNullOrWhiteSpace(article.Title) ? article.Id : article.Title))
+            .Matching(context);
     }
 }

@@ -89,8 +89,8 @@ Tags and custom fields are deliberately not part of the file: they are taxonomy 
 
 Document360 has no webhooks for article changes, so both events poll the workspace on an interval you choose. Neither event fires on its first run: that run only records the current state so the next one has something to compare against.
 
-- **On article created** — Fires for articles created since the previous check. Filter by locale, publication status, tags and visibility.
-- **On article published** — Fires for articles that went live, or that had a newer version put live, since the previous check. Filter by locale, tags and visibility. This event compares the live version number of every article rather than the article status, because an article that is live and also has a newer draft still reports its status as a draft.
+- **On articles created** — Fires for articles created since the previous check. Filter by locale, publication status, tags and visibility.
+- **On articles published** — Fires for articles that went live, or that had a newer version put live, since the previous check. Filter by locale, tags and visibility. This event compares the live version number of every article rather than the article status, because an article that is live and also has a newer draft still reports its status as a draft. It fulfils the standard Blackbird content event blueprint, so a translation workflow built on another CMS can be pointed at Document360 without being rebuilt: every article it outputs carries the article ID the blueprint's download step expects.
 
 Filtering by tags costs one extra request per changed article, since tags are not part of the article list Document360 returns.
 

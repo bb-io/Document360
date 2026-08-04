@@ -1,9 +1,11 @@
+using Apps.Document360.Extensions;
 using Apps.Document360.Models.Dtos;
 using Apps.Document360.Models.Identifiers;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
+using RestSharp;
 
 namespace Apps.Document360.Handlers;
 
@@ -19,26 +21,25 @@ public class CategoryDataHandler(InvocationContext invocationContext, [ActionPar
     {
         if (string.IsNullOrWhiteSpace(workspace.WorkspaceId)) return [];
 
-        var roots = await Workspaces.GetCategoriesAsync(workspace.WorkspaceId, cancellationToken: cancellationToken);
-        var flattened = new List<(string Id, string Path)>();
-        Flatten(roots, string.Empty, flattened);
+        // The articles hanging off the tree are not needed to name a category, and a workspace can hold hundreds.
+        var request = new RestRequest($"/v2/ProjectVersions/{workspace.WorkspaceId}/categories", Method.Get)
+            .AddQueryParameter("excludeArticles", "true");
 
-        return flattened
-            .Where(item => context.SearchString is null ||
-                           item.Path.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .Take(50)
-            .Select(item => new DataSourceItem(item.Id, item.Path));
+        var roots = await Client.GetListAsync<CategoryDto>(request, cancellationToken);
+        var items = new List<DataSourceItem>();
+        Flatten(roots, string.Empty, items);
+
+        return items.Matching(context);
     }
 
-    private static void Flatten(IEnumerable<CategoryDto> categories, string parentPath,
-        List<(string Id, string Path)> target)
+    private static void Flatten(IEnumerable<CategoryDto> categories, string parentPath, List<DataSourceItem> target)
     {
         foreach (var category in categories)
         {
             var name = string.IsNullOrWhiteSpace(category.Name) ? category.Id : category.Name;
             var path = string.IsNullOrEmpty(parentPath) ? name : $"{parentPath} / {name}";
 
-            target.Add((category.Id, path));
+            target.Add(new DataSourceItem(category.Id, path));
 
             if (category.ChildCategories is { Count: > 0 }) Flatten(category.ChildCategories, path, target);
         }

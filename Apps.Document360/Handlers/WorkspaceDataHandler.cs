@@ -1,3 +1,5 @@
+using Apps.Document360.Api;
+using Apps.Document360.Extensions;
 using Apps.Document360.Utils;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
@@ -10,19 +12,14 @@ public class WorkspaceDataHandler(InvocationContext invocationContext)
     public async Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context,
         CancellationToken cancellationToken)
     {
-        var workspaces = await Workspaces.GetWorkspacesAsync(cancellationToken);
+        var workspaces = await ProjectProvider.GetWorkspacesAsync(Client, cancellationToken);
 
         return workspaces
-            .Select(workspace => new
-            {
-                workspace.Id,
-                Label = workspace.VersionType == 1
+            .Select(workspace => new DataSourceItem(workspace.Id,
+                // An API documentation workspace is named after the reference it documents, so its kind is spelled out.
+                workspace.VersionType == 1
                     ? $"{workspace.VersionCodeName} ({Document360Enums.WorkspaceType(workspace.VersionType)})"
-                    : workspace.VersionCodeName ?? workspace.Id
-            })
-            .Where(item => context.SearchString is null ||
-                           item.Label.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .Take(50)
-            .Select(item => new DataSourceItem(item.Id, item.Label));
+                    : workspace.VersionCodeName ?? workspace.Id))
+            .Matching(context);
     }
 }

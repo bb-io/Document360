@@ -1,8 +1,9 @@
+using Apps.Document360.Api;
 using Apps.Document360.Models.Identifiers;
 using Apps.Document360.Models.Responses;
+using Apps.Document360.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
-using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Document360.Actions;
@@ -14,7 +15,7 @@ public class WorkspaceActions(InvocationContext invocationContext) : Invocable(i
         Description = "Get the workspaces of the knowledge base project, together with the languages each supports.")]
     public async Task<SearchWorkspacesResponse> SearchWorkspaces()
     {
-        var workspaces = await Workspaces.GetWorkspacesAsync();
+        var workspaces = await ProjectProvider.GetWorkspacesAsync(Client);
         var results = workspaces.Select(workspace => new WorkspaceResponse(workspace)).ToList();
 
         return new SearchWorkspacesResponse { Workspaces = results, TotalCount = results.Count };
@@ -24,10 +25,9 @@ public class WorkspaceActions(InvocationContext invocationContext) : Invocable(i
     public async Task<SearchWorkspaceLocalesResponse> SearchWorkspaceLocales(
         [ActionParameter] WorkspaceIdentifier identifier)
     {
-        if (string.IsNullOrWhiteSpace(identifier.WorkspaceId))
-            throw new PluginMisconfigurationException("'Workspace ID' cannot be empty. Please fill it in.");
+        Validate.Workspace(identifier);
 
-        var locales = await Workspaces.GetWorkspaceLocalesAsync(identifier.WorkspaceId);
+        var locales = await ProjectProvider.GetWorkspaceLocalesAsync(Client, identifier.WorkspaceId);
         var results = locales.Select(locale => new LocaleResponse(locale)).ToList();
 
         return new SearchWorkspaceLocalesResponse { Locales = results, TotalCount = results.Count };

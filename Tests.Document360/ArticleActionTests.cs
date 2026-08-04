@@ -140,7 +140,7 @@ public class ArticleActionTests : TestBase
         Assert.IsNotNull(result.Articles);
         Assert.AreEqual(result.Articles.Count, result.TotalCount);
         Assert.IsTrue(result.TotalCount > 100, "Pagination should return more than a single page of 100 articles.");
-        Assert.AreEqual(result.Articles.Count, result.Articles.Select(x => x.ArticleId).Distinct().Count());
+        Assert.AreEqual(result.Articles.Count, result.Articles.Select(x => x.ContentId).Distinct().Count());
     }
 
     [TestMethod]

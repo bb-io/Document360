@@ -12,9 +12,9 @@ using RestSharp;
 namespace Apps.Document360.Api;
 
 /// <summary>
-/// Transport for the Document360 Customer API v2. It owns authentication, the response envelope, paging and the
-/// translation of failures into Blackbird exceptions — and nothing about articles, workspaces or any other kind of
-/// content. Those live in the services under <c>Api/Services</c>.
+/// Transport for the Document360 Customer API v2. It owns authentication, the response envelope, paging, throttling
+/// and the translation of failures into Blackbird exceptions — and knows nothing about articles, workspaces or any
+/// other kind of content. Each endpoint is built by the action, event or data source that needs it.
 /// </summary>
 /// <remarks>
 /// Three vendor quirks are handled here: every payload is wrapped in an envelope, a failed operation can arrive

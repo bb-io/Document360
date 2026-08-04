@@ -1,3 +1,5 @@
+using Apps.Document360.Api;
+using Apps.Document360.Extensions;
 using Apps.Document360.Models.Identifiers;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
@@ -18,23 +20,20 @@ public class LocaleDataHandler(InvocationContext invocationContext, [ActionParam
     {
         var locales = string.IsNullOrWhiteSpace(workspace.WorkspaceId)
             ? await GetProjectLocalesAsync(cancellationToken)
-            : (await Workspaces.GetWorkspaceLocalesAsync(workspace.WorkspaceId, cancellationToken))
+            : (await ProjectProvider.GetWorkspaceLocalesAsync(Client, workspace.WorkspaceId, cancellationToken))
             .Select(locale => (Code: locale.LanguageCode, Name: locale.LanguageName ?? locale.LanguageCode))
             .ToList();
 
         return locales
             .Where(locale => !string.IsNullOrWhiteSpace(locale.Code))
             .DistinctBy(locale => locale.Code, StringComparer.OrdinalIgnoreCase)
-            .Select(locale => new { locale.Code, Label = $"{locale.Name} - {locale.Code}" })
-            .Where(item => context.SearchString is null ||
-                           item.Label.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .Take(50)
-            .Select(item => new DataSourceItem(item.Code, item.Label));
+            .Select(locale => new DataSourceItem(locale.Code, $"{locale.Name} - {locale.Code}"))
+            .Matching(context);
     }
 
     private async Task<List<(string Code, string Name)>> GetProjectLocalesAsync(CancellationToken cancellationToken)
     {
-        var workspaces = await Workspaces.GetWorkspacesAsync(cancellationToken);
+        var workspaces = await ProjectProvider.GetWorkspacesAsync(Client, cancellationToken);
 
         return workspaces
             .SelectMany(item => item.LanguageVersions ?? [])

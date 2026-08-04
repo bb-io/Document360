@@ -1,3 +1,5 @@
+using Apps.Document360.Api;
+using Apps.Document360.Extensions;
 using Apps.Document360.Utils;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
@@ -14,20 +16,14 @@ public abstract class ArticleVersionDataHandlerBase(InvocationContext invocation
         var (articleId, locale) = Target;
         if (string.IsNullOrWhiteSpace(articleId) || string.IsNullOrWhiteSpace(locale)) return [];
 
-        var versions = await Articles.GetArticleVersionsAsync(articleId, locale, cancellationToken);
+        var versions = await ArticleProvider.GetArticleVersionsAsync(Client, articleId, locale, cancellationToken);
 
         return versions
             .OrderByDescending(version => version.VersionNumber)
-            .Select(version => new
-            {
-                Value = version.VersionNumber.ToString(),
-                Label = BuildLabel(version.VersionNumber, Document360Enums.ArticleStatus(version.Status),
-                    version.ModifiedAt)
-            })
-            .Where(item => context.SearchString is null ||
-                           item.Label.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .Take(50)
-            .Select(item => new DataSourceItem(item.Value, item.Label));
+            .Select(version => new DataSourceItem(version.VersionNumber.ToString(),
+                BuildLabel(version.VersionNumber, Document360Enums.ArticleStatus(version.Status),
+                    version.ModifiedAt)))
+            .Matching(context);
     }
 
     protected abstract (string ArticleId, string Locale) Target { get; }
