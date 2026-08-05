@@ -367,3 +367,9 @@ MigrationBackup/
 FodyWeavers.xsd
 
 */appsettings.json
+/.investigation
+/.claude
+*postman_collection.json
+initial_data.md
+investigation_results.md
+/Tests.Document360/TestFiles/Output

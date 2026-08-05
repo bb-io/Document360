@@ -1,4 +1,4 @@
-# Blackbird.io Appname
+# Blackbird.io Document360
 
 Blackbird is the new automation backbone for the language technology industry. Blackbird provides enterprise-scale automation and orchestration with a simple no-code/low-code platform. Blackbird enables ambitious organizations to identify, vet and automate as many processes as possible. Not just localization workflows, but any business and IT process. This repository represents an application that is deployable on Blackbird and usable inside the workflow editor.
 
@@ -6,10 +6,50 @@ Blackbird is the new automation backbone for the language technology industry. B
 
 <!-- begin docs -->
 
-Documentation coming soon.
+Document360 is a knowledge base platform for building and publishing product documentation and help centers. Use this app to manage your knowledge base articles — create them, update translations, publish changes, and automate the translation workflow.
 
-## Feedback
+## Getting started
 
-Do you want to use this app or do you have feedback on our implementation? Reach out to us using the [established channels](https://www.blackbird.io/) or create an issue.
+You'll need:
+
+1. A Document360 account with access to your knowledge base
+2. An **API token** — go to **Settings > Knowledge base portal > API tokens** in Document360 and create one for your project
+3. Your **API hub URL** — the default is `https://apihub.document360.io`, or `https://apihub.us.document360.io` if your knowledge base is in the United States
+
+## Connecting
+
+1. Search for **Document360** in the Apps section
+2. Click **Add connection**
+3. Give it a name you'll recognize (e.g., "Product knowledge base")
+4. Enter your **API hub URL** and **API token**
+5. Click **Connect**
+6. Verify the connection successfully created
+
+![connecting to Document360](./README/image/connecting.png)
+
+## Actions
+
+### Articles
+
+- **Search articles** — Find articles in your knowledge base. Filter by language, publication status, or when they were last changed.
+- **Create article** — Add a new article. You can publish it right away or save it as a draft first.
+- **Get article info** — See the full details of one article, including its title, status, translations, and any custom information.
+- **Download article** — Export an article's content as a file ready for translation. Pass it to any translation tool and then upload the result back.
+- **Update article** — Change an article's content, title, or other details. Perfect for uploading translated versions or making updates.
+- **Publish article** — Make an article or translation go live on your knowledge base.
+
+### Workspaces
+
+- **Search workspaces** — See all versions of your knowledge base and which languages each one supports.
+- **Search workspace locales** — View the languages available in a specific knowledge base version.
+
+### Custom fields
+
+- **Search custom fields** — Find any custom fields your knowledge base uses.
+
+## Events
+
+- **On articles created** — Triggers when new articles are added to your knowledge base. You can filter by language, publication status, or visibility.
+- **On articles published** — Triggers when articles are published or updated. You can filter by language or visibility.
 
 <!-- end docs -->

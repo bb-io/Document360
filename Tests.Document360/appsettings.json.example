@@ -1,0 +1,7 @@
+{
+  "ConnectionDefinition": {
+    "base_url": "https://apihub.us.document360.io",
+    "api_token": ""
+  },
+  "TestFolder": "TestFiles"
+}
