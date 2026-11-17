@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <Product>Document360 [Beta]</Product>
         <Description>Document360 is a cloud-based knowledge management platform that enables organizations to create, manage, and share internal and external documentation efficiently.</Description>
-        <Version>1.0.0</Version>
+        <Version>1.0.1</Version>
         <AssemblyName>Apps.Document360</AssemblyName>
     </PropertyGroup>
 
@@ -23,4 +23,7 @@
         <EmbeddedResource CopyToOutputDirectory="Always" Include="image\icon.png" />
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="..\README.md" Link="README.md" CopyToOutputDirectory="Always" />
+    </ItemGroup>
 </Project>
